@@ -1,0 +1,45 @@
+import org.jetbrains.intellij.tasks.PrepareSandboxTask
+
+plugins {
+    id 'org.jetbrains.intellij' version '1.3.0'
+    id 'java'
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+// See https://github.com/JetBrains/gradle-intellij-plugin/
+intellij {
+    version = '2021.3.1'
+    type = 'CL'
+    plugins = ['com.intellij.cidr.base', 'com.intellij.clion']
+}
+
+patchPluginXml {
+    changeNotes = """
+      Add change notes here.<br>
+      <em>most HTML tags may be used</em>"""
+}
+
+task copyPrettyPrinters(type: Copy) {
+    dependsOn "prepareSandbox"
+    from "${rootDir}/python"
+    include "**/*.py"
+    into "${buildDir}/idea-sandbox/plugins/Qt6Renderer/python"
+}
+
+tasks.getByName("buildPlugin").dependsOn("copyPrettyPrinters")
+tasks.getByName("runIde").dependsOn("copyPrettyPrinters")
+
+test {
+    useJUnitPlatform()
+}

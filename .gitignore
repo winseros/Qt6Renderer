@@ -1,0 +1,5 @@
+.idea/
+.gradle/
+build/
+example-project/.idea
+example-project/cmake-build-*
