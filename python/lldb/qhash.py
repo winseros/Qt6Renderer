@@ -1,5 +1,6 @@
 from abstractsynth import AbstractSynth
 from lldb import SBValue, SBType, SBError, eBasicTypeUnsignedLongLong
+from helpers import TypeHelpers
 import re
 
 
@@ -11,9 +12,9 @@ def qhash_summary(valobj: SBValue):
 class AlignedStruct:
     def __init__(self, t_key: SBType, t_val: SBType):
         self.offset_key = 0
-        self.offset_value = AlignedStruct._calc_offset(t_key.size, t_val.size)
+        self.offset_value = self._calc_offset(t_key.size, t_val.size)
         self_min_size = self.offset_value + t_val.size
-        self.offset_next = AlignedStruct._calc_offset(self_min_size, self_min_size)
+        self.offset_next = self._calc_offset(self_min_size, self_min_size)
 
     _alignment = 4  # works for GCCx64; TODO check for MSVC
 
@@ -45,8 +46,13 @@ class QHashSynth(AbstractSynth):
         return 128 + 2 * self._type_uint.size
 
     def _get_key_value_types(self) -> (SBType, SBType, AlignedStruct):
-        type_key = self._valobj.type.GetTemplateArgumentType(0)
-        type_value = self._valobj.type.GetTemplateArgumentType(1)
+        if self._valobj.type.GetNumberOfTemplateArguments() > 0:
+            type_key = self._valobj.type.GetTemplateArgumentType(0)
+            type_value = self._valobj.type.GetTemplateArgumentType(1)
+        else:
+            module = self._valobj.GetFrame().GetModule()
+            [type_key, type_value] = TypeHelpers.read_template_types(module, self._valobj.type, 2)
+
         alignment = AlignedStruct(type_key, type_value)
 
         return type_key, type_value, alignment
@@ -85,7 +91,7 @@ class QHashSynth(AbstractSynth):
 
         type_key, type_value, alignment = self._get_key_value_types()
 
-        # print(f'type_key={type_key.name}, type_value={type_value.name}, entry_size={entry_size}')
+        # print(f'type_key={type_key.name}, type_value={type_value.name}')
         # print(f'key_size={type_key.size}, value_size={type_value.size}')
 
         for b in range(nspans):

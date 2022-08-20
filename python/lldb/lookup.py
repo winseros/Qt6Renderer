@@ -20,18 +20,14 @@ from qtemporarydir import qtemporarydir_summary, QTemporaryDirSynth
 from qtime import qtime_summary, QTimeSynth
 from qtimezone import qtimezone_summary, QTimeZoneSynth
 from qsharedpointer import qsharedpointer_summary, QSharedPointerSynth
-from qshareddatapointer import qshareddatapointer_summary, QSharedDataPointerSynth
 from qurl import qurl_summary, QUrlSynth
 from quuid import quuid_summary
 from qvariant import QVariantSynth
 
 
-def summary_lookup(valobj: SBValue, dict, opts, replacement_type=None):
-    type = valobj.type if replacement_type is None else replacement_type
+def summary_lookup(valobj: SBValue, dict):
+    type = valobj.type.GetUnqualifiedType().GetCanonicalType()
     type_name = type.name
-
-    if type_name.startswith('const '):
-        type_name = type_name[6:]
 
     print('Summary ' + valobj.name + '||' + type_name)
 
@@ -65,8 +61,6 @@ def summary_lookup(valobj: SBValue, dict, opts, replacement_type=None):
         return qsharedpointer_summary(valobj)
     elif type_name.startswith('QWeakPointer<') and type_name.endswith('>'):
         return qsharedpointer_summary(valobj)
-    elif type_name.startswith('QSharedDataPointer<') and type_name.endswith('>'):
-        return qshareddatapointer_summary(valobj)
     elif type_name.endswith('QString'):
         return qstring_summary(valobj)
     elif type_name.endswith('QTemporaryDir'):
@@ -80,19 +74,12 @@ def summary_lookup(valobj: SBValue, dict, opts, replacement_type=None):
     elif type_name.endswith('QUuid'):
         return quuid_summary(valobj)
 
-    if type.IsTypedefType():
-        type = type.GetTypedefedType()
-        return summary_lookup(valobj, dict, opts, type)
-
     return ''
 
 
-def synthetic_lookup(valobj: SBValue, dict, replacement_type = None):
-    type = valobj.type if replacement_type is None else replacement_type
+def synthetic_lookup(valobj: SBValue, dict):
+    type = valobj.type.GetUnqualifiedType().GetCanonicalType()
     type_name = type.name
-
-    if type_name.startswith('const '):
-        type_name = type_name[6:]
 
     print('Synth ' + valobj.name + '||' + type_name)
 
@@ -123,8 +110,6 @@ def synthetic_lookup(valobj: SBValue, dict, replacement_type = None):
         return QLocaleSynth(valobj)
     elif type_name.startswith('QMap<') and type_name.endswith('>'):
         return QMapSynth(valobj)
-    elif type_name.startswith('QSharedDataPointer<') and type_name.endswith('>'):
-        return QSharedDataPointerSynth(valobj)
     elif type_name.startswith('QSharedPointer<') and type_name.endswith('>'):
         return QSharedPointerSynth(valobj)
     elif type_name.endswith('QString'):
@@ -141,9 +126,5 @@ def synthetic_lookup(valobj: SBValue, dict, replacement_type = None):
         return QSharedPointerSynth(valobj)
     elif type_name.endswith('QVariant'):
         return QVariantSynth(valobj)
-
-    if type.IsTypedefType():
-        type = type.GetTypedefedType()
-        return synthetic_lookup(valobj, dict, type)
 
     return None

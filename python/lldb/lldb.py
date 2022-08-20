@@ -107,6 +107,7 @@ class SBType:
     vbases: int
     fields: List[SBTypeMember]
     template_args: List[SBType]
+    enum_members: List[SBTypeEnumMember]
 
 
 class SBValue:

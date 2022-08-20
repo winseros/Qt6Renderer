@@ -1,4 +1,4 @@
-from lldb import SBTarget, SBValue, SBExpressionOptions
+from lldb import SBTarget, SBValue, SBType, SBModule, SBExpressionOptions
 
 
 class QtHelpers:
@@ -183,3 +183,43 @@ class DateTimeHelpers:
         type_int = target.GetBasicType(eBasicTypeInt)
 
         return (endianness, pointer_size, type_int)
+
+
+class TypeHelpers:
+    @staticmethod
+    def read_template_types(module: SBModule, native_type: SBType, count: int):
+        start_index = native_type.name.find('<')
+
+        result = []
+        if start_index < 0:
+            return result
+
+        for i in range(count):
+            type_name = TypeHelpers._read_type_name(native_type.name, start_index + 1)
+            type_name = TypeHelpers._normalize_type_name(type_name)
+            sb_type = module.FindFirstType(type_name)
+            result.append(sb_type)
+            start_index += len(type_name) + 1
+
+        return result
+
+    @staticmethod
+    def _read_type_name(name: str, start_at: int) -> str:
+        result = ''
+        inner_types = 0
+        for i in range(start_at, len(name)):
+            char = name[i]
+            if inner_types == 0 and (char == ',' or char == '>'):
+                return result.strip()
+            if char == '<':
+                inner_types += 1
+            elif char == '>':
+                inner_types -= 1
+            result += char
+        raise 'Incorrect type name'
+
+    @staticmethod
+    def _normalize_type_name(type_name: str) -> str:
+        # make 'type_name' from, say, 'enum type_name'
+        start_index = type_name.find(' ')
+        return type_name if start_index < 0 else type_name[start_index + 1:]
