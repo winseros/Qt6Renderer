@@ -7,7 +7,7 @@ from qdate import qdate_summary, QDateSynth
 from qdatetime import qdatetime_summary, QDateTimeSynth
 from qdir import qdir_summary, QDirSynth
 from qevent import QEventSynth
-from qfile import qfile_summary, QFileSynth
+from qfile import qfile_summary, QFileSynth, QTemporaryFileSynth
 from qfileinfo import qfileinfo_summary, QFileInfoSynth
 from qflags import qflags_summary
 from qhash import qhash_summary, QHashSynth, QHashIteratorSynth
@@ -63,6 +63,8 @@ def summary_lookup(valobj: SBValue, dict):
         return qsharedpointer_summary(valobj)
     elif type_name.endswith('QString'):
         return qstring_summary(valobj)
+    elif type_name.endswith('QTemporaryFile'):
+        return qfile_summary(valobj)
     elif type_name.endswith('QTemporaryDir'):
         return qtemporarydir_summary(valobj)
     elif type_name.endswith('QTime'):
@@ -116,6 +118,8 @@ def synthetic_lookup(valobj: SBValue, dict):
         return QStringSynth(valobj)
     elif type_name.endswith('QTemporaryDir'):
         return QTemporaryDirSynth(valobj)
+    elif type_name.endswith('QTemporaryFile'):
+        return QTemporaryFileSynth(valobj)
     elif type_name.endswith('QTime'):
         return QTimeSynth(valobj)
     elif type_name.endswith('QTimeZone'):

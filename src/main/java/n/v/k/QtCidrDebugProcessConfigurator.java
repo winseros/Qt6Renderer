@@ -47,7 +47,7 @@ public class QtCidrDebugProcessConfigurator implements CidrDebugProcessConfigura
                 registerBoth(debuggerDriver, threadId, frameIndex, "QDateTime", false);
                 registerBoth(debuggerDriver, threadId, frameIndex, "QDir", false);
                 registerSynth(debuggerDriver, threadId, frameIndex, "QEvent", false);
-//                registerBoth(debuggerDriver, threadId, frameIndex, "QFile", false);
+                registerBoth(debuggerDriver, threadId, frameIndex, "QFile", false);
                 registerBoth(debuggerDriver, threadId, frameIndex, "QFileInfo", false);
                 registerSummary(debuggerDriver, threadId, frameIndex, "QFlags", true);
                 registerBoth(debuggerDriver, threadId, frameIndex, "QHash", true);
@@ -57,6 +57,7 @@ public class QtCidrDebugProcessConfigurator implements CidrDebugProcessConfigura
 //                registerBoth(debuggerDriver, threadId, frameIndex, "QMap", true);
                 registerBoth(debuggerDriver, threadId, frameIndex, "QSharedPointer", true);
                 registerBoth(debuggerDriver, threadId, frameIndex, "QString", false);
+                registerBoth(debuggerDriver, threadId, frameIndex, "QTemporaryFile", false);
                 registerBoth(debuggerDriver, threadId, frameIndex, "QTemporaryDir", false);
                 registerBoth(debuggerDriver, threadId, frameIndex, "QTime", false);
                 registerBoth(debuggerDriver, threadId, frameIndex, "QTimeZone", false);
