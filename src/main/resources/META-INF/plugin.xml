@@ -1,11 +1,14 @@
 <idea-plugin>
     <id>n.v.k.Qt6Renderer</id>
-    <name>Plugin display name here</name>
-    <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+    <name>QT6 Renderer</name>
+    <vendor email="win.accuracy@gmail.com" url="https://github.com/winseros/Qt6Renderer">Nikita Kobzev</vendor>
 
     <description><![CDATA[
-    Enter short description for your plugin here.<br>
-    <em>most HTML tags may be used</em>
+    The plugin for pretty printing Qt types by CLion debugger.
+    Supported Qt versions: 6.x.
+    Supported platforms: Windows, Linux.
+    Supported architectures: X64.
+    Supported debuggers: LLDB.
     ]]></description>
 
     <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
