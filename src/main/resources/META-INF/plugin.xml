@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>n.v.k.Qt6Renderer</id>
-    <name>QT6 Renderer</name>
-    <vendor email="win.accuracy@gmail.com" url="https://github.com/winseros/Qt6Renderer">Nikita Kobzev</vendor>
+    <name>Qt6 Renderer</name>
+    <vendor email="win.accuracy@gmail.com" url="https://github.com/winseros">Nikita Kobzev</vendor>
 
     <description><![CDATA[
     The plugin for pretty printing Qt types by CLion debugger.

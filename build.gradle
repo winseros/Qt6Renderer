@@ -1,20 +1,20 @@
 import org.jetbrains.intellij.tasks.PrepareSandboxTask
 
 plugins {
-    id 'org.jetbrains.intellij' version '1.3.0'
+    id 'org.jetbrains.intellij' version '1.9.0'
     id 'java'
 }
 
-group 'org.example'
-version '1.0-SNAPSHOT'
+group 'n.v.k.Qt6Renderer'
+version '0.2.0'
+
+buildSearchableOptions.enabled = false
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 }
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
@@ -26,8 +26,10 @@ intellij {
 
 patchPluginXml {
     changeNotes = """
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>"""
+      * 1.0.0
+      Initial version"""
+    sinceBuild = '213.6461'
+    untilBuild = ''
 }
 
 task copyPrettyPrinters(type: Copy) {
@@ -38,6 +40,7 @@ task copyPrettyPrinters(type: Copy) {
 }
 
 tasks.getByName("buildPlugin").dependsOn("copyPrettyPrinters")
+tasks.getByName("buildSearchableOptions").dependsOn("copyPrettyPrinters")
 tasks.getByName("runIde").dependsOn("copyPrettyPrinters")
 
 test {
