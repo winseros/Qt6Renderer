@@ -29,7 +29,7 @@ def summary_lookup(valobj: SBValue, dict):
     type = valobj.type.GetUnqualifiedType().GetCanonicalType()
     type_name = type.name
 
-    print('Summary ' + valobj.name + '||' + type_name)
+    # print('Summary ' + valobj.name + '||' + type_name)
 
     if type_name.endswith('QAtomicInt') or type_name.endswith('QBasicAtomicInt'):
         return qatomicint_summary(valobj)
@@ -83,7 +83,7 @@ def synthetic_lookup(valobj: SBValue, dict):
     type = valobj.type.GetUnqualifiedType().GetCanonicalType()
     type_name = type.name
 
-    print('Synth ' + valobj.name + '||' + type_name)
+    # print('Synth ' + valobj.name + '||' + type_name)
 
     if type_name.endswith('QBitArray'):
         return QBitArraySynth(valobj)
