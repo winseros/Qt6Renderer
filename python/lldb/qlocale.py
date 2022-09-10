@@ -18,8 +18,9 @@ class QLocaleSynth(AbstractSynth):
         self._type_territory = m.FindFirstType(valobj.type.name + '::Territory')
         if not self._type_territory.IsValid():
             self._type_territory = m.FindFirstType(valobj.type.name + '::Country')
-        #self._type_num_opts = m.FindFirstType(valobj.type.name + '::NumberOptions')
-        self._type_num_opts = m.FindFirstType(f'QFlags<enum {valobj.type.name}::NumberOption>')
+        self._type_num_opts = m.FindFirstType(valobj.type.name + '::NumberOptions')
+        if not self._type_num_opts.IsValid():
+            self._type_num_opts = m.FindFirstType(f'QFlags<enum {valobj.type.name}::NumberOption>')
         # self._type_currency_code = t.GetBasicType(eBasicTypeChar).GetArrayType(3)
 
     def get_child_index(self, name: str) -> int:
