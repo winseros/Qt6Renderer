@@ -1,0 +1,39 @@
+name: Artifacts
+on:
+  push:
+    branches-ignore:
+      - main
+    tags:
+      - v*
+
+jobs:
+  release:
+    name: Build
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'corretto'
+
+      - uses: actions/checkout@v3
+
+      - name: Set Version - Main
+        if: ${{startsWith(github.ref, 'refs/tags/v')}}
+        run: |
+          echo "ORG_GRADLE_PROJECT_buildVersion=$(echo '${{github.ref}}' | sed -e 's/refs\/heads\/v//')" >> $GITHUB_ENV
+
+      - name: Set Version - Branch
+        if: ${{startsWith(github.ref, 'refs/heads/')}}
+        run: |
+          echo "ORG_GRADLE_PROJECT_buildVersion=${{github.run_number}}-$(echo '${{github.ref}}' | sed -e 's/refs\/heads\///' | sed -e 's/[^a-zA-Z0-9]/_/g')-$(echo ${{github.sha}} | cut -c 1-8)" >> $GITHUB_ENV
+
+      - name: Gradle build
+        run: chmod +x ./gradlew && ./gradlew :buildPlugin
+
+      - name: Upload binaries
+        uses: actions/upload-artifact@v3
+        with:
+          name: Qt6Renderer-${{env.ORG_GRADLE_PROJECT_buildVersion}}
+          path: ${{github.workspace}}/build/idea-sandbox/plugins/*

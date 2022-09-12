@@ -1,14 +1,10 @@
-import org.jetbrains.intellij.tasks.PrepareSandboxTask
-
 plugins {
-    id 'org.jetbrains.intellij' version '1.9.0'
-    id 'java'
+    id "org.jetbrains.intellij" version "1.9.0"
+    id "java"
 }
 
-group 'n.v.k.Qt6Renderer'
-version '0.2.0'
-
-buildSearchableOptions.enabled = false
+group = "n.v.k"
+version = hasProperty("buildVersion") ? buildVersion : "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -18,18 +14,19 @@ dependencies {
 }
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
+buildSearchableOptions.enabled = false
 intellij {
-    version = '2021.3.1'
-    type = 'CL'
-    plugins = ['com.intellij.cidr.base', 'com.intellij.clion']
+    version = "2021.3.1"
+    type = "CL"
+    plugins = ["com.intellij.cidr.base", "com.intellij.clion"]
 }
 
 patchPluginXml {
     changeNotes = """
       * 1.0.0
       Initial version"""
-    sinceBuild = '213.6461'
-    untilBuild = ''
+    sinceBuild = "213.6461"
+    untilBuild = ""
 }
 
 task copyPrettyPrinters(type: Copy) {
@@ -39,9 +36,13 @@ task copyPrettyPrinters(type: Copy) {
     into "${buildDir}/idea-sandbox/plugins/Qt6Renderer/python"
 }
 
-tasks.getByName("buildPlugin").dependsOn("copyPrettyPrinters")
-tasks.getByName("buildSearchableOptions").dependsOn("copyPrettyPrinters")
-tasks.getByName("runIde").dependsOn("copyPrettyPrinters")
+buildPlugin {
+    dependsOn "copyPrettyPrinters"
+}
+
+runIde {
+    dependsOn "copyPrettyPrinters"
+}
 
 test {
     useJUnitPlatform()
