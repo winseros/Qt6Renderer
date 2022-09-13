@@ -22,7 +22,7 @@ jobs:
       - name: Set Version - Main
         if: ${{startsWith(github.ref, 'refs/tags/v')}}
         run: |
-          echo "ORG_GRADLE_PROJECT_buildVersion=$(echo '${{github.ref}}' | sed -e 's/refs\/heads\/v//')" >> $GITHUB_ENV
+          echo "ORG_GRADLE_PROJECT_buildVersion=$(echo '${{github.ref}}' | sed -e 's/refs\/tags\/v//')" >> $GITHUB_ENV
 
       - name: Set Version - Branch
         if: ${{startsWith(github.ref, 'refs/heads/')}}
