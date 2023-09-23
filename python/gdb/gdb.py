@@ -1,3 +1,6 @@
+from typing import Union, SupportsIndex
+
+
 class Field:
     bitpos: int
     enumval: int
@@ -7,6 +10,7 @@ class Field:
     bitsize: int
     type: 'Type'
     parent_type: 'Type'
+
 
 class Type:
     alignof: int
@@ -40,9 +44,10 @@ class Type:
 
     def target(self) -> 'Type': ...
 
-    def template_argument(self, n: int, block = None) -> 'Type': ...
+    def template_argument(self, n: int, block=None) -> 'Type': ...
 
     def optimized_out(self) -> 'Value': ...
+
 
 TYPE_CODE_PTR: str
 TYPE_CODE_ARRAY: str
@@ -75,7 +80,8 @@ TYPE_CODE_XMETHOD: str
 TYPE_CODE_FIXED_POINT: str
 TYPE_CODE_NAMESPACE: str
 
-class Value:
+
+class Value(SupportsIndex):
     address: 'Value'
     is_optimized_out: bool
     type: Type
@@ -91,6 +97,20 @@ class Value:
     def __lshift__(self, other) -> 'Value': ...
 
     def __rshift__(self, other) -> 'Value': ...
+
+    def __lt__(self, other) -> 'Value': ...
+
+    def __gt__(self, other) -> 'Value': ...
+
+    def __le__(self, other) -> 'Value': ...
+
+    def __ge__(self, other) -> 'Value': ...
+
+    def __rand__(self, other) -> 'Value': ...
+
+    def __index__(self) -> int: ...
+
+    def __int__(self) -> int: ...
 
     def cast(self, type: Type) -> 'Value': ...
 
@@ -108,10 +128,14 @@ class Value:
 
     def format_string(self) -> str: ...
 
-    def string(self, encoding: str = None, errors: str = None, length: int = None) -> str: ...
+    def string(self, encoding: str = None, errors: str = None, length: Union[int, 'Value'] = None) -> str: ...
 
-    def lazy_string(self, encoding: str = None, length: int = None) -> str: ...
+    def lazy_string(self, encoding: str = None, length: Union[int, 'Value'] = None) -> str: ...
 
     def fetch_lazy(self) -> None: ...
 
+
 def lookup_type(type_name: str) -> Type: ...
+
+
+def parse_and_eval(expr: str) -> Value: ...
