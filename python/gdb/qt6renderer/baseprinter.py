@@ -22,9 +22,6 @@ class StructureOnlyPrinter(AbstractPrinter):
     def children(self) -> Iterable[Tuple[str, Value]]:
         pass
 
-    def display_hint(self):
-        return 'array'
-
 
 class StringAndStructurePrinter(AbstractPrinter):
     @abstractmethod
@@ -34,6 +31,3 @@ class StringAndStructurePrinter(AbstractPrinter):
     @abstractmethod
     def children(self) -> Iterable[Tuple[str, Value]]:
         pass
-
-    def display_hint(self):
-        return 'array'

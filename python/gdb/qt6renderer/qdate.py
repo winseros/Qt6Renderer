@@ -8,8 +8,8 @@ from .helpers import DateTimeHelpers
 class QDatePrinter(StringAndStructurePrinter):
     def to_string(self) -> str:
         jd = self._valobj['jd']
-        year, date, month = DateTimeHelpers.parse_julian_date(int(jd))
-        return f'{year}-{date:02d}-{month:02d}' if year else DateTimeHelpers.VAL_INVALID
+        year, month, day = DateTimeHelpers.parse_julian_date(int(jd))
+        return f'{year}-{month:02d}-{day:02d}' if year else DateTimeHelpers.VAL_INVALID
 
     def children(self) -> Iterable[Tuple[str, Value]]:
         jd = self._valobj['jd']
