@@ -3,19 +3,25 @@ from typing import Tuple
 
 
 def has_cpp_type(valobj: Value, cpp_name: str) -> bool:
-    type_tag = valobj.type.tag
+    type_tag = _get_type_tag(valobj)
     if not type_tag:
         return False
     result = type_tag == cpp_name
     return result
 
 
-def has_cpp_generic_type(valobj: Value, cpp_name: str) -> bool:
-    type_tag = valobj.type.tag
+def has_cpp_generic_type(valobj: Value, cpp_name: str, suffix: str = None) -> bool:
+    type_tag = _get_type_tag(valobj)
     if not type_tag:
         return False
-    result = type_tag.startswith(cpp_name + '<') and type_tag.endswith('>')
+    result = type_tag.startswith(cpp_name + '<') and type_tag.endswith(f'>{suffix}')
     return result
+
+
+def _get_type_tag(valobj: Value) -> str:
+    type = valobj.type
+    tag = type.tag if type.tag else type.strip_typedefs().tag
+    return tag
 
 
 class DateTimeHelpers:
@@ -39,9 +45,9 @@ class DateTimeHelpers:
     _MSEC_PER_DAY = 86_400_000
 
     @staticmethod
-    def parse_julian_date(jd: int) -> (Value, Value, Value):
+    def parse_julian_date(jd: int) -> Tuple[int, int, int]:
         if jd < DateTimeHelpers._JD_MIN or jd > DateTimeHelpers._JD_MAX:
-            return None, None, None
+            return 0, 0, 0
 
         # The below code is from the Qt sources:
 
@@ -67,9 +73,9 @@ class DateTimeHelpers:
         return year, month, day
 
     @staticmethod
-    def parse_time(mds: int) -> (int, int, int, int):
+    def parse_time(mds: int) -> Tuple[int, int, int, int]:
         if mds == -1:
-            return None, None, None, None
+            return 0, 0, 0, 0
 
         (mds, milliseconds) = divmod(mds, DateTimeHelpers._MSEC_PER_SEC)
         (mds, seconds) = divmod(mds, DateTimeHelpers._SEC_PER_MIN)

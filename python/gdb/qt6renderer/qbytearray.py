@@ -23,4 +23,4 @@ class QByteArrayPrinter(StringAndStructurePrinter):
     def to_string(self) -> str:
         d = self._valobj['d']
         d_size = d['size']
-        return f'size={str(d_size)}'
+        return f'size={d_size}'
