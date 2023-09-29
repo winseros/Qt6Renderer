@@ -10,7 +10,7 @@ def has_cpp_type(valobj: Value, cpp_name: str) -> bool:
     return result
 
 
-def has_cpp_generic_type(valobj: Value, cpp_name: str, suffix: str = None) -> bool:
+def has_cpp_generic_type(valobj: Value, cpp_name: str, suffix: str = '') -> bool:
     type_tag = _get_type_tag(valobj)
     if not type_tag:
         return False

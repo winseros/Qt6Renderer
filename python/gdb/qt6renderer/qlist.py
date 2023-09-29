@@ -1,5 +1,5 @@
 from .qarraydatapointer import QArrayDataPointerPrinter
 
 
-class QByteArrayPrinter(QArrayDataPointerPrinter):
+class QListPrinter(QArrayDataPointerPrinter):
     pass

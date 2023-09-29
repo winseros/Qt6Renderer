@@ -11,7 +11,12 @@ from .qfile import QFilePrinter
 from .qfileinfo import QFileInfoPrinter
 from .qflags import QFlagsPrinter
 from .qhash import QHashPrinter, QHashIteratorPrinter
+from .qhostaddress import QHostAddressPrinter
+from .qlocale import QLocalePrinter
+from .qlist import QListPrinter
 from .qstring import QStringPrinter
+from .qtemporarydir import QTemporaryDirPrinter
+from .qtime import QTimePrinter
 from .helpers import has_cpp_type, has_cpp_generic_type
 
 
@@ -38,11 +43,22 @@ def qt6_lookup(valobj: Value):
         return QFileInfoPrinter(valobj)
     elif has_cpp_generic_type(valobj, 'QFlags'):
         return QFlagsPrinter(valobj)
-    elif (has_cpp_generic_type(valobj, 'QHash')
-          or has_cpp_generic_type(valobj, 'QHash', '::iterator')
+    elif has_cpp_generic_type(valobj, 'QHash'):
+        return QHashPrinter(valobj)
+    elif (has_cpp_generic_type(valobj, 'QHash', '::iterator')
           or has_cpp_generic_type(valobj, 'QHash', '::const_iterator')):
         return QHashIteratorPrinter(valobj)
+    elif has_cpp_type(valobj, 'QHostAddress'):
+        return QHostAddressPrinter(valobj)
+    elif has_cpp_type(valobj, 'QLocale'):
+        return QLocalePrinter(valobj)
+    elif has_cpp_generic_type(valobj, 'QList'):
+        return QListPrinter(valobj)
     elif has_cpp_type(valobj, 'QString'):
         return QStringPrinter(valobj)
+    elif has_cpp_type(valobj, 'QTemporaryDir'):
+        return QTemporaryDirPrinter(valobj)
+    elif has_cpp_type(valobj, 'QTime'):
+        return QTimePrinter(valobj)
 
     return None

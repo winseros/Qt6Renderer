@@ -89,6 +89,6 @@ class QHashIteratorPrinter(StructureOnlyPrinter):
 
     @staticmethod
     def _get_parent_type(iterator_type: Type) -> Type:
-        parent_type_name = iterator_type.name.split('::')[0]
+        parent_type_name = iterator_type.tag.split('::')[0]
         parent_type = lookup_type(parent_type_name)
         return parent_type
