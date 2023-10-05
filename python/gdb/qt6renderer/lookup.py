@@ -17,6 +17,9 @@ from .qlist import QListPrinter
 from .qstring import QStringPrinter
 from .qtemporarydir import QTemporaryDirPrinter
 from .qtime import QTimePrinter
+from .qurl import QUrlPrinter
+from .quuid import QUuidPrinter
+from .qvariant import QVariantPrinter
 from .helpers import has_cpp_type, has_cpp_generic_type
 
 
@@ -60,5 +63,11 @@ def qt6_lookup(valobj: Value):
         return QTemporaryDirPrinter(valobj)
     elif has_cpp_type(valobj, 'QTime'):
         return QTimePrinter(valobj)
+    elif has_cpp_type(valobj, 'QUrl'):
+        return QUrlPrinter(valobj)
+    elif has_cpp_type(valobj, 'QUuid'):
+        return QUuidPrinter(valobj)
+    elif has_cpp_type(valobj, 'QVariant'):
+        return QVariantPrinter(valobj)
 
     return None

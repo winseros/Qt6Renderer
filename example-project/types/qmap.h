@@ -5,6 +5,7 @@
 #include <QSharedPointer>
 
 void DemoQMap() {
+    QMap<int, int> map0;
     QMap<QString, QString> map1({{"k1", "v1"},
                                  {"k2", "v2"},
                                  {"k3", "v3"}});
