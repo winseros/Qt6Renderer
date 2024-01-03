@@ -20,10 +20,14 @@ from .qtime import QTimePrinter
 from .qurl import QUrlPrinter
 from .quuid import QUuidPrinter
 from .qvariant import QVariantPrinter
+from .qt import qt, QtVersion
 from .helpers import has_cpp_type, has_cpp_generic_type
 
 
 def qt6_lookup(valobj: Value):
+    if qt().version() < QtVersion.V6_0_0:
+        return None
+
     if has_cpp_type(valobj, 'QAtomicInt'):
         return QAtomicIntPrinter(valobj)
     elif has_cpp_type(valobj, 'QBitArray'):
