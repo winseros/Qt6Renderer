@@ -135,7 +135,28 @@ class Value(SupportsIndex):
     def fetch_lazy(self) -> None: ...
 
 
+class Symbol:
+    type: 'Type'
+    line: int
+    name: str
+    linkage_name: str
+    print_name: str
+    addr_class: None
+    needs_frame: bool
+    is_argument: bool
+    is_constant: bool
+    is_function: bool
+    is_variable: bool
+
+    def is_valid(self) -> bool: ...
+
+    def value(self, frame: None) -> 'Value': ...
+
+
 def lookup_type(type_name: str) -> Type: ...
 
 
 def parse_and_eval(expr: str) -> Value: ...
+
+
+def lookup_symbol(name: str, domain: str = None) -> [Symbol, bool]: ...
