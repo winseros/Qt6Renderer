@@ -32,9 +32,9 @@ patchPluginXml {
 
 task copyPrettyPrinters(type: Copy) {
     dependsOn "prepareSandbox"
-    from "${rootDir}/python"
+    from project.layout.projectDirectory.dir("python")
     include "**/*.py"
-    into "${buildDir}/idea-sandbox/plugins/Qt6Renderer/python"
+    into project.layout.buildDirectory.dir("idea-sandbox/plugins/Qt6Renderer/python").get()
 }
 
 buildPlugin {
