@@ -1,5 +1,7 @@
 .idea/
 .gradle/
 build/
+Pipfile
+Pipfile.lock
 example-project/.idea
 example-project/cmake-build-*
