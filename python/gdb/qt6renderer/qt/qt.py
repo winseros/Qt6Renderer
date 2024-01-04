@@ -20,36 +20,17 @@ class Qt:
         # This function is replaced by handleQtCoreLoaded()
         return ''
 
-    def version_string(self) -> Union[str, None]:
-        try:
-            return str(lookup_symbol('qVersion')[0].value()())
-        except:
-            pass
-        try:
-            ns = self.namespace()
-            return str(parse_and_eval("((const char*(*)())'%sqVersion')()" % ns))
-        except:
-            pass
-        return None
-
     def version(self) -> int:
         try:
             # Only available with Qt 5.3+
-            qt_version = int(str(parse_and_eval('((void**)&qtHookData)[2]')), 16)
+            qt_version = int(parse_and_eval('((void**)&qtHookData)[2]'), 16)
             self.qtVersion = lambda: qt_version
             return qt_version
         except:
             pass
 
-        try:
-            version = self.version_string()
-            (major, minor, patch) = version[version.find('"') + 1:version.rfind('"')].split('.')
-            qt_version = 0x10000 * int(major) + 0x100 * int(minor) + int(patch)
-            self.qtVersion = lambda: qt_version
-            return qt_version
-        except:
-            # Use fallback until we have a better answer.
-            return self.fallbackQtVersion
+        # Use fallback until we have a better answer.
+        return self.fallbackQtVersion
 
     def symbolAddress(self, symbolName) -> Value:
         res = parse_and_eval('(qsizetype*)' + symbolName)
