@@ -13,6 +13,7 @@ from .qflags import QFlagsPrinter
 from .qhash import QHashPrinter, QHashIteratorPrinter
 from .qhostaddress import QHostAddressPrinter
 from .qlocale import QLocalePrinter
+from .qmap import QMapPrinter
 from .qshareddatapointer import QSharedDataPointerPrinter
 from .qsharedpointer import QSharedPointerPrinter
 from .qlist import QListPrinter
@@ -62,6 +63,8 @@ def qt6_lookup(valobj: Value):
         return QHostAddressPrinter(valobj)
     elif has_cpp_type(valobj, 'QLocale'):
         return QLocalePrinter(valobj)
+    elif has_cpp_generic_type(valobj, 'QMap'):
+        return QMapPrinter(valobj)
     elif has_cpp_generic_type(valobj, 'QSharedDataPointer'):
         return QSharedDataPointerPrinter(valobj)
     elif has_cpp_generic_type(valobj, 'QSharedPointer'):
