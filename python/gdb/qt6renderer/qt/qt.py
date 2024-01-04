@@ -5,7 +5,7 @@ from typing import Union
 
 class QtVersion(IntEnum):
     V6_0_0 = 0x060000
-    V6_3_0 = 0x060300
+    V6_4_0 = 0x060400
 
 
 class QtTiVersion(IntEnum):
@@ -13,24 +13,11 @@ class QtTiVersion(IntEnum):
 
 
 class Qt:
-    def __init__(self):
-        self.fallbackQtVersion = 0x60200
-
-    def namespace(self) -> str:
-        # This function is replaced by handleQtCoreLoaded()
-        return ''
-
     def version(self) -> int:
-        try:
-            # Only available with Qt 5.3+
-            qt_version = int(parse_and_eval('((void**)&qtHookData)[2]'), 16)
-            self.qtVersion = lambda: qt_version
-            return qt_version
-        except:
-            pass
-
-        # Use fallback until we have a better answer.
-        return self.fallbackQtVersion
+        # Only available with Qt 5.3+
+        qt_version = int(parse_and_eval('*(&qtHookData)')[2])
+        self.qtVersion = lambda: qt_version
+        return qt_version
 
     def symbolAddress(self, symbolName) -> Value:
         res = parse_and_eval('(qsizetype*)' + symbolName)
