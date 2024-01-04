@@ -38,3 +38,5 @@ class QBitArrayPrinter(StringAndStructurePrinter):
 
                         bit_index_in_byte += 1
                         bit_index_global += 1
+        else:
+            yield QBitArrayPrinter.PROP_SIZE, 0

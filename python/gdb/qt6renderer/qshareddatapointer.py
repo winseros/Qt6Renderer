@@ -5,14 +5,15 @@ from .baseprinter import StructureOnlyPrinter
 
 
 class QSharedDataPointerPrinter(StructureOnlyPrinter):
-    PROP_RAW_POINTER = 'raw_pointer'
-    PROP_DATA = 'data'
+    PROP_POINTER = 'pointer'
+    PROP_VALUE = 'value'
 
     def children(self) -> Iterable[Tuple[str, Value]]:
         d = self._valobj['d']
-        yield QSharedDataPointerPrinter.PROP_RAW_POINTER, d
-
-        if d:
+        if not d:
+            yield QSharedDataPointerPrinter.PROP_POINTER, d
+        else:
             if d.type != d.dynamic_type:
                 d = d.dynamic_cast(d.dynamic_type)
-            yield QSharedDataPointerPrinter.PROP_DATA, d.dereference()
+            yield QSharedDataPointerPrinter.PROP_VALUE, d.dereference()
+            yield QSharedDataPointerPrinter.PROP_POINTER, d

@@ -14,6 +14,7 @@ from .qhash import QHashPrinter, QHashIteratorPrinter
 from .qhostaddress import QHostAddressPrinter
 from .qlocale import QLocalePrinter
 from .qshareddatapointer import QSharedDataPointerPrinter
+from .qsharedpointer import QSharedPointerPrinter
 from .qlist import QListPrinter
 from .qstring import QStringPrinter
 from .qtemporarydir import QTemporaryDirPrinter
@@ -21,6 +22,7 @@ from .qtime import QTimePrinter
 from .qurl import QUrlPrinter
 from .quuid import QUuidPrinter
 from .qvariant import QVariantPrinter
+from .qweakpointer import QWeakPointerPrinter
 from .qt import qt, QtVersion
 from .helpers import has_cpp_type, has_cpp_generic_type
 
@@ -29,7 +31,7 @@ def qt6_lookup(valobj: Value):
     if qt().version() < QtVersion.V6_0_0:
         return None
 
-    if has_cpp_type(valobj, 'QAtomicInt'):
+    if has_cpp_type(valobj, 'QAtomicInt') or has_cpp_generic_type(valobj, 'QBasicAtomicInteger'):
         return QAtomicIntPrinter(valobj)
     elif has_cpp_type(valobj, 'QBitArray'):
         return QBitArrayPrinter(valobj)
@@ -62,6 +64,8 @@ def qt6_lookup(valobj: Value):
         return QLocalePrinter(valobj)
     elif has_cpp_generic_type(valobj, 'QSharedDataPointer'):
         return QSharedDataPointerPrinter(valobj)
+    elif has_cpp_generic_type(valobj, 'QSharedPointer'):
+        return QSharedPointerPrinter(valobj)
     elif has_cpp_generic_type(valobj, 'QList'):
         return QListPrinter(valobj)
     elif has_cpp_type(valobj, 'QString'):
@@ -76,5 +80,7 @@ def qt6_lookup(valobj: Value):
         return QUuidPrinter(valobj)
     elif has_cpp_type(valobj, 'QVariant'):
         return QVariantPrinter(valobj)
+    elif has_cpp_generic_type(valobj, 'QWeakPointer'):
+        return QWeakPointerPrinter(valobj)
 
     return None
