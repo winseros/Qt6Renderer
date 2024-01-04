@@ -1,5 +1,5 @@
 plugins {
-    id "org.jetbrains.intellij" version "1.9.0"
+    id "org.jetbrains.intellij" version "1.16.1"
     id "java"
 }
 
@@ -19,6 +19,7 @@ intellij {
     version = "2021.3.1"
     type = "CL"
     plugins = ["com.intellij.cidr.base", "com.intellij.clion"]
+    targetCompatibility = 11
 }
 
 patchPluginXml {
@@ -31,9 +32,9 @@ patchPluginXml {
 
 task copyPrettyPrinters(type: Copy) {
     dependsOn "prepareSandbox"
-    from "${rootDir}/python"
+    from project.layout.projectDirectory.dir("python")
     include "**/*.py"
-    into "${buildDir}/idea-sandbox/plugins/Qt6Renderer/python"
+    into project.layout.buildDirectory.dir("idea-sandbox/plugins/Qt6Renderer/python").get()
 }
 
 buildPlugin {

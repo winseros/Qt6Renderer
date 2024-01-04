@@ -16,10 +16,30 @@ void DemoQHash()
     h1.insert("k9", "v9");
     h1.insert("k10", "v10");
 
+    QHash<QChar, QString> h11;
+    h11.insert('1', "v1");
+    h11.insert('2', "v2");
+    h11.insert('3', "v3");
+
+    QHash<QString, QChar> h12;
+    h12.insert("k1", '1');
+    h12.insert("k2", '2');
+    h12.insert("k3", '3');
+
     QHash<char, int> h2;
     h2.insert('a', 1);
     h2.insert('b', 2);
     h2.insert('c', 3);
+
+    QHash<short, int> h21;
+    h21.insert(0, 1);
+    h21.insert(2, 3);
+    h21.insert(4, 5);
+
+    QHash<char, short> h22;
+    h22.insert(0, 1);
+    h22.insert(2, 3);
+    h22.insert(4, 5);
 
     QHash<short, char> h3;
     h3.insert(0, 'a');
@@ -30,6 +50,7 @@ void DemoQHash()
     h4.insert(0, 1);
     h4.insert(2, 3);
     h4.insert(4, 5);
+    h4.remove(4);
 
     QHash<char, char> h5;
     h5.insert('a', 'b');

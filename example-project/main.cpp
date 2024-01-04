@@ -18,6 +18,7 @@
 #include "types/qmodelindex.h"
 #include "types/qstring.h"
 #include "types/qtemporarydir.h"
+#include "types/qscopedpointer.h"
 #include "types/qsharedpointer.h"
 #include "types/qtime.h"
 #include "types/qtimezone.h"
@@ -47,6 +48,7 @@ int main()
     DemoQModelIndex();
     DemoQString();
     DemoQTemporaryDir();
+    DemoQScopedPointer();
     DemoQSharedPointer();
     DemoQTime();
     DemoQTimeZone();

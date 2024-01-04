@@ -8,7 +8,7 @@
     Supported Qt versions: 6.x.
     Supported platforms: Windows, Linux.
     Supported architectures: X64.
-    Supported debuggers: LLDB.
+    Supported debuggers: GDB, LLDB.
     ]]></description>
 
     <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
