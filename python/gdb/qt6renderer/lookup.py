@@ -30,7 +30,13 @@ from .helpers import has_cpp_type, has_cpp_generic_type
 
 
 def qt6_lookup(valobj: Value):
-    if qt().version() < QtVersion.V6_0_0:
+    try:
+        if qt().version() < QtVersion.V6_0_0:
+            return None
+    except:
+        # Either there is no Qt
+        # Or it is some Qt version (e.g. 6.2.4), that hides the version information
+        # and can not be handled by this plugin.
         return None
 
     if has_cpp_type(valobj, 'QAtomicInt') or has_cpp_generic_type(valobj, 'QBasicAtomicInteger'):

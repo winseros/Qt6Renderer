@@ -16,24 +16,24 @@ class Qt:
     def version(self) -> int:
         # Only available with Qt 5.3+
         qt_version = int(parse_and_eval('*(&qtHookData)')[2])
-        self.qtVersion = lambda: qt_version
+        self.version = lambda: qt_version
         return qt_version
 
-    def symbolAddress(self, symbolName) -> Value:
+    def symbol_address(self, symbolName) -> Value:
         res = parse_and_eval('(qsizetype*)' + symbolName)
         return None if res is None else res
 
-    def qtHookDataSymbolName(self) -> str:
+    def qt_hook_data_symbol_name(self) -> str:
         return 'qtHookData'
 
     def type_info_version(self) -> Union[int, None]:
-        addr = self.symbolAddress(self.qtHookDataSymbolName())
+        addr = self.symbol_address(self.qt_hook_data_symbol_name())
         if addr:
             # Only available with Qt 5.3+
             hook_version = addr.dereference()
             if hook_version >= 3:
                 ti_version = int((addr + 6).dereference())
-                self.qtTypeInfoVersion = lambda: ti_version
+                self.type_info_version = lambda: ti_version
                 return ti_version
         return None
 
