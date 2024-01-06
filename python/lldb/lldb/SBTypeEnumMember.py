@@ -1,0 +1,19 @@
+from .SBType import SBType
+
+class SBTypeEnumMember:
+    name: str
+    signed: int
+    type: 'SBType'
+    unsigned: int
+
+    def GetDescription(self, description: 'SBStream', description_level: int) -> bool: ...
+
+    def GetName(self) -> str: ...
+
+    def GetType(self) -> SBType: ...
+
+    def GetValueAsSigned(self) -> int: ...
+
+    def GetValueAsUnsigned(self) -> int: ...
+
+    def IsValid(self) -> int: ...

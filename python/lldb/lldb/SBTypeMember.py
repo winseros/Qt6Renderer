@@ -1,0 +1,26 @@
+from .SBType import SBType
+
+
+class SBTypeMember:
+    bit_offset: int
+    bitfield_bit_size: int
+    byte_offset: int
+    is_bitfield: bool
+    name: str
+    type: 'SBType'
+
+    def GetBitfieldSizeInBits(self) -> int: ...
+
+    def GetDescription(self, description: 'SBStream', description_level: int) -> bool: ...
+
+    def GetName(self) -> str: ...
+
+    def GetOffsetInBits(self) -> int: ...
+
+    def GetOffsetInBytes(self) -> int: ...
+
+    def GetType(self) -> SBType: ...
+
+    def IsBitfield(self) -> bool: ...
+
+    def IsValid(self) -> bool: ...
