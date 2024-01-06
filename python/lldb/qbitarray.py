@@ -3,8 +3,6 @@ from abstractsynth import AbstractSynth
 
 
 def qbitarray_summary(valobj):
-    # type: (SBValue) -> str
-    """Formats the QT QBitArray type"""
     child_count = valobj.GetNumChildren()
     if child_count == 1:
         return ''
@@ -56,7 +54,7 @@ class QBitArraySynth(AbstractSynth):
         self._values = self._values_zero
 
         d_d = self._valobj.GetChildMemberWithName('d').GetChildMemberWithName('d')
-        d_d_size_val = d_d.GetChildMemberWithName('size').GetValueAsUnsigned()
+        d_d_size_val = d_d.GetChildMemberWithName('size').GetValueAsSigned()
         if d_d_size_val:
             d_d_ptr_val = d_d.GetChildMemberWithName('ptr').GetValueAsUnsigned()
             error = SBError()

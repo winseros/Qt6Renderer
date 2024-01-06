@@ -8,5 +8,4 @@ def qatomicint_summary(valobj: SBValue):
     if error.Success():
         return str(value)
 
-    print('qatomicint_summary: ' + error.GetCString())
     return None

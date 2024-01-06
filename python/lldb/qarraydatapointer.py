@@ -1,4 +1,4 @@
-from abstractsynth import AbstractSynth
+from .abstractsynth import AbstractSynth
 
 
 class QArrayDataPointerSynth(AbstractSynth):

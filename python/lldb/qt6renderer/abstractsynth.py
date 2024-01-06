@@ -1,4 +1,5 @@
 from lldb import SBValue
+from abc import abstractmethod
 
 
 class AbstractSynth:
@@ -15,11 +16,11 @@ class AbstractSynth:
     def get_child_at_index(self, index: int) -> SBValue:
         return self._values[index] if index < len(self._values) else None
 
-    def get_child_index(self, name: str) -> int:
-        ...
+    @abstractmethod
+    def get_child_index(self, name: str) -> int: ...
 
-    def update(self) -> bool:
-        ...
+    @abstractmethod
+    def update(self) -> bool: ...
 
     def get_value(self):
         return self._valobj

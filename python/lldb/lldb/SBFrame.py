@@ -1,4 +1,4 @@
-from typing import List, Any
+from typing import Any
 
 from .SBAddress import SBAddress
 from .SBError import SBError
@@ -8,8 +8,8 @@ from .SBValueList import SBValueList
 
 class SBFrame:
     addr: SBAddress
-    args: List[SBValue]
-    arguments: List[SBValue]
+    args: SBValueList
+    arguments: SBValueList
     block: 'SBBlock'
     compile_unit: 'SBCompileUnit'
     disassembly: str
@@ -18,20 +18,20 @@ class SBFrame:
     idx: int
     is_inlined: bool
     line_entry: 'SBLineEntry'
-    locals: List[SBValue]
+    locals: SBValueList
     module: SBModule
     name: 'str'
     parent: 'SBFrame'
     pc: int
     register: Any
-    registers: List[SBValue]
-    regs: List[SBValue]
+    registers: SBValueList
+    regs: SBValueList
     sp: int
-    statistics: List[SBValue]
+    statistics: SBValueList
     symbol: 'SBSymbol'
     thread: 'SBThread'
-    variables: List[SBValue]
-    vars: List[SBValue]
+    variables: SBValueList
+    vars: SBValueList
 
     def Clear(self): ...
 
