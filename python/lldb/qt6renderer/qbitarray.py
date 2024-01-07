@@ -2,7 +2,7 @@ from lldb import eBasicTypeBool, SBData, SBValue
 from .abstractsynth import AbstractSynth
 
 
-def qbitarray_summary(valobj):
+def qbitarray_summary(valobj: SBValue):
     child_count = valobj.GetNumChildren()
     if child_count == 1:
         return ''

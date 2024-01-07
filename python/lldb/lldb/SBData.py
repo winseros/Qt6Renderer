@@ -6,25 +6,25 @@ from .SBTarget import SBTarget
 
 class SBData:
     byte_order: int
-    double: float
+    double: List[float]
     doubles: List[float]
-    float: float
+    float: List['float']
     floats: List['float']
-    sint16: int
+    sint16: List[int]
     sint16s: List[int]
-    sint32: int
+    sint32: List[int]
     sint32s: List[int]
-    sint64: int
+    sint64: List[int]
     sint64s: List[int]
-    sint8: int
+    sint8: List[int]
     sint8s: List[int]
-    uint16: int
+    uint16: List[int]
     uint16s: List[int]
-    uint32: int
+    uint32: List[int]
     uint32s: List[int]
-    uint64: int
+    uint64: List[int]
     uint64s: List[int]
-    uint8: int
+    uint8: List[int]
     uint8s: List[int]
 
     def Append(self, rhs: 'SBData'): ...
@@ -41,16 +41,16 @@ class SBData:
     def CreateDataFromInt(value, size: int = None, target: SBTarget = None, ptr_size: int = None, endian: int = None) -> 'SBData': ...
 
     @staticmethod
-    def CreateDataFromSInt32Array(self, endian: int, addr_byte_size: int, array: List[int]) -> 'SBData': ...
+    def CreateDataFromSInt32Array(endian: int, addr_byte_size: int, array: List[int]) -> 'SBData': ...
 
     @staticmethod
-    def CreateDataFromSInt64Array(self, endian: int, addr_byte_size: int, array: List[int]) -> 'SBData': ...
+    def CreateDataFromSInt64Array(endian: int, addr_byte_size: int, array: List[int]) -> 'SBData': ...
 
     @staticmethod
-    def CreateDataFromUInt32Array(self, endian: int, addr_byte_size: int, array: List[int]) -> 'SBData': ...
+    def CreateDataFromUInt32Array(endian: int, addr_byte_size: int, array: List[int]) -> 'SBData': ...
 
     @staticmethod
-    def CreateDataFromUInt64Array(self, endian: int, addr_byte_size: int, array: List[int]) -> 'SBData': ...
+    def CreateDataFromUInt64Array(endian: int, addr_byte_size: int, array: List[int]) -> 'SBData': ...
 
     def GetAddress(self, error: SBError, offset: int) -> int: ...
 
