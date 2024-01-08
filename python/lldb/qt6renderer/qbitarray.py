@@ -42,7 +42,7 @@ class QBitArraySynth(AbstractSynth):
         d_d = self._valobj.GetChildMemberWithName('d').GetChildMemberWithName('d')
         d_d_size = d_d.GetChildMemberWithName(QBitArraySynth.PROP_SIZE)
 
-        self._values.append(d_d_size)
+        self._values = [d_d_size]
 
         if d_d_size:
             d_d_size_v = d_d_size.GetValueAsSigned()

@@ -32,7 +32,7 @@ class QArrayDataPointerSynth(AbstractSynth):
     def update(self):
         d = self._valobj.GetChildMemberWithName('d')
         size = d.GetChildMemberWithName(QArrayDataPointerSynth.PROP_SIZE)
-        self._values.append(size)
+        self._values = [size]
 
         d_ptr = d.GetChildMemberWithName('ptr')
         if d_ptr.GetValueAsUnsigned():

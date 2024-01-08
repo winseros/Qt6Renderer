@@ -22,8 +22,7 @@ class QSharedDataPointerSynth(AbstractSynth):
     def update(self) -> bool:
         d = self._valobj.GetChildMemberWithName('d')
 
-        self._values.append(
-            self._valobj.CreateValueFromData(QSharedDataPointerSynth.PROP_POINTER, d.data, d.type))
+        self._values = [self._valobj.CreateValueFromData(QSharedDataPointerSynth.PROP_POINTER, d.data, d.type)]
 
         if d.GetValueAsUnsigned():
             value = d.Dereference()

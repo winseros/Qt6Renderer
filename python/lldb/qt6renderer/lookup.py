@@ -7,6 +7,9 @@ from .qbytearray import qbytearray_summary, QByteArraySynth
 from .qchar import qchar_summary
 from .qdate import qdate_summary, QDateSynth
 from .qdatetime import qdatetime_summary, QDateTimeSynth
+from .qdir import qdir_summary, QDirSynth
+from .qfile import qfile_summary, QFileSynth, QTemporaryFileSynth
+from .qevent import QEventSynth
 from .qshareddatapointer import qshareddatapointer_summary, QSharedDataPointerSynth
 from .qstring import qstring_summary, QStringSynth
 
@@ -28,6 +31,10 @@ def qt6_lookup_summary(valobj: SBValue, internal_dict):
         return qdate_summary(valobj)
     elif has_cpp_type(valobj, 'QDateTime'):
         return qdatetime_summary(valobj)
+    elif has_cpp_type(valobj, 'QDir'):
+        return qdir_summary(valobj)
+    elif has_cpp_type(valobj, 'QFile') or has_cpp_type(valobj, 'QTemporaryFile'):
+        return qfile_summary(valobj)
     elif has_cpp_generic_type(valobj, 'QSharedDataPointer'):
         return qshareddatapointer_summary(valobj)
     elif has_cpp_type(valobj, 'QString'):
@@ -49,6 +56,14 @@ def qt6_lookup_synthetic(valobj: SBValue, internal_dict):
         return QDateSynth(valobj)
     elif has_cpp_type(valobj, 'QDateTime'):
         return QDateTimeSynth(valobj)
+    elif has_cpp_type(valobj, 'QDir'):
+        return QDirSynth(valobj)
+    elif has_cpp_type(valobj, 'QFile'):
+        return QFileSynth(valobj)
+    elif has_cpp_type(valobj, 'QTemporaryFile'):
+        return QTemporaryFileSynth(valobj)
+    elif has_cpp_type(valobj, 'QEvent'):
+        return QEventSynth(valobj)
     elif has_cpp_generic_type(valobj, 'QSharedDataPointer'):
         return QSharedDataPointerSynth(valobj)
     elif has_cpp_type(valobj, 'QString'):

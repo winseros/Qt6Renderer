@@ -8,7 +8,7 @@ class AbstractSynth:
         self._values = []
 
     def has_children(self) -> bool:
-        return len(self._values) > 0
+        return True
 
     def num_children(self) -> int:
         return len(self._values)
