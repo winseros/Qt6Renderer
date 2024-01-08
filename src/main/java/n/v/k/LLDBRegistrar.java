@@ -45,6 +45,7 @@ class LLDBRegistrar {
         registerSynth(debuggerDriver, threadId, frameIndex, "QMap", true);
         registerBoth(debuggerDriver, threadId, frameIndex, "QScopedPointer", true);
         registerBoth(debuggerDriver, threadId, frameIndex, "QSharedPointer", true);
+        registerBoth(debuggerDriver, threadId, frameIndex, "QSharedDataPointer", true);
         registerBoth(debuggerDriver, threadId, frameIndex, "QString", false);
         registerBoth(debuggerDriver, threadId, frameIndex, "QTemporaryFile", false);
         registerBoth(debuggerDriver, threadId, frameIndex, "QTemporaryDir", false);

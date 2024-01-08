@@ -114,9 +114,9 @@ class QDateTimeSynth(AbstractSynth):
 class QDateTimePrivate(SyntheticStruct):
     def __init__(self, pointer: SBValue):
         super().__init__(pointer)
-        self.add_field('status', eBasicTypeInt)
-        self.add_field('msecs', eBasicTypeLongLong)
-        self.add_field('offset_from_utc', eBasicTypeInt)
+        self.add_basic_type_field('status', eBasicTypeInt)
+        self.add_basic_type_field('msecs', eBasicTypeLongLong)
+        self.add_basic_type_field('offset_from_utc', eBasicTypeInt)
 
     def status(self) -> SBValue:
         pass

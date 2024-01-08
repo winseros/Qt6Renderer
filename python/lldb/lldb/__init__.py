@@ -15,3 +15,9 @@ from .SBTypeList import *
 from .SBTypeMember import *
 from .SBValue import *
 from .SBValueList import *
+
+frame: SBFrame
+module: SBModule
+process: SBProcess
+target: SBTarget
+thread: 'SBThread'
