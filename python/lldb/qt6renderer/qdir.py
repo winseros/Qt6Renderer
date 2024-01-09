@@ -1,7 +1,10 @@
+from lldb import SBValue
 from .qt import qt, QtVersion
-from .qstring import qstring_summary
 from .abstractsynth import AbstractSynth
+from .qfilesystementry import QFileSystemEntry
+from .qstring import qstring_summary
 from .platformhelpers import platform_is_32bit
+from .syntheticstruct import SyntheticStruct
 
 
 def qdir_summary(valobj):
@@ -27,36 +30,18 @@ class QDirSynth(AbstractSynth):
             return -1
 
     def update(self):
-        bit32 = platform_is_32bit(self._valobj)
+        priv = QDirPrivate(self._valobj.GetChildMemberWithName('d_ptr').GetChildMemberWithName('d'))
 
-        if qt().version() >= QtVersion.V6_6_0:
-            if bit32:
-                dirEntryOffset = 24
-                fileCacheOffset = 52
-                absoluteDirEntryOffset = fileCacheOffset + 32
-            else:
-                dirEntryOffset = 48
-                fileCacheOffset = 104
-                absoluteDirEntryOffset = fileCacheOffset + 64
-        else:
-            if bit32:
-                dirEntryOffset = 40
-                absoluteDirEntryOffset = 72
-            else:
-                dirEntryOffset = 96
-                absoluteDirEntryOffset = 152
-
-        type_qstring = self._valobj.target.FindFirstType('QString')
-        addr = self._valobj.GetChildMemberWithName('d_ptr').GetChildMemberWithName('d').GetValueAsUnsigned()
-
-        path = self._valobj.CreateValueFromAddress(QDirSynth.PROP_PATH, addr + dirEntryOffset, type_qstring)
+        path = self._valobj.CreateValueFromData(QDirSynth.PROP_PATH, priv.path().file_path().data,
+                                                priv.path().file_path().type)
         self._values = [path]
 
         # warm up caches; does not work on Windows
         self._valobj.EvaluateExpression('absolutePath()')
 
-        absolute_path = self._valobj.CreateValueFromAddress(QDirSynth.PROP_ABSOLUTE_PATH, addr + absoluteDirEntryOffset,
-                                                            type_qstring)
+        absolute_path = self._valobj.CreateValueFromData(QDirSynth.PROP_ABSOLUTE_PATH,
+                                                         priv.abs_path().file_path().data,
+                                                         priv.abs_path().file_path().type)
         self._values.append(absolute_path)
 
         # the below code does not work on Windows; due to outdated LLDB, I guess
@@ -66,3 +51,33 @@ class QDirSynth(AbstractSynth):
             self._values.append(exists)
 
         return False
+
+
+class QDirPrivate(SyntheticStruct):
+    def __init__(self, pointer: SBValue):
+        super().__init__(pointer)
+        self.add_gap_field(self._get_offset())
+        self.add_synthetic_field('path', QFileSystemEntry(pointer))
+        self.add_synthetic_field('abs_path', QFileSystemEntry(pointer))
+
+    def path(self) -> QFileSystemEntry:
+        pass
+
+    def abs_path(self) -> QFileSystemEntry:
+        pass
+
+    def _get_offset(self):
+        bit32 = platform_is_32bit(self._pointer)
+
+        if qt().version() >= QtVersion.V6_6_0:
+            if bit32:
+                offset = 24
+            else:
+                offset = 48
+        else:
+            if bit32:
+                offset = 40
+            else:
+                offset = 96
+
+        return offset

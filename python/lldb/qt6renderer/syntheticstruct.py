@@ -7,7 +7,10 @@ class SyntheticStruct:
     def __init__(self, pointer: SBValue):
         self._pointer = pointer
         self._size = 0
-        self._byte_offset = 0
+        self.struct_byte_offset = 0
+
+    def add_gap_field(self, gap_size: int):
+        self._size += gap_size
 
     def add_basic_type_field(self, name: str, basic_type: int, pointer=False, getter_name: str = None):
         sb_type = self._pointer.GetTarget().GetBasicType(basic_type)
@@ -20,10 +23,10 @@ class SyntheticStruct:
         self._add_field(name, sb_type, getter_name)
 
     def add_synthetic_field(self, name: str, synthetic_struct: 'SyntheticStruct'):
-        byte_offset = self._get_field_byte_offset(synthetic_struct)
-        synthetic_struct._byte_offset = byte_offset + self._byte_offset
+        field_byte_offset = self._get_field_byte_offset(synthetic_struct)
+        synthetic_struct.struct_byte_offset = field_byte_offset + self.struct_byte_offset
 
-        self._size = byte_offset + synthetic_struct.size
+        self._size = field_byte_offset + synthetic_struct.size
         setattr(self, name, lambda: synthetic_struct)
 
     def _add_field(self, name: str, type: SBType, getter_name: str):
@@ -36,7 +39,7 @@ class SyntheticStruct:
 
     def _field_impl(self, name: str, byte_offset: int, type: SBType) -> SBValue:
         struct_addr = self._pointer.GetValueAsUnsigned() if self._pointer.TypeIsPointerType() else self._pointer.load_addr
-        struct_addr += self._byte_offset
+        struct_addr += self.struct_byte_offset
 
         field_addr = struct_addr + byte_offset
 

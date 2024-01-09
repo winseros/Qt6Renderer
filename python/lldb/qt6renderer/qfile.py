@@ -74,7 +74,7 @@ class QFilePrivate(SyntheticStruct):
 
     def __init__(self, pointer: SBValue):
         super().__init__(pointer)
-        self._byte_offset = self._get_struct_offset(pointer)
+        self.add_gap_field(self._get_struct_offset(pointer))
         self.add_named_type_field(QFilePrivate.PROP_FILE_NAME, 'QString', 'file_name')
 
     def file_name(self) -> SBValue:
