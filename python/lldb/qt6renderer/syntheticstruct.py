@@ -4,10 +4,10 @@ from typing import Union
 
 
 class SyntheticStruct:
-    def __init__(self, pointer: SBValue):
+    def __init__(self, pointer: SBValue, address_byte_offset=0):
         self._pointer = pointer
         self._size = 0
-        self.struct_byte_offset = 0
+        self._address_byte_offset = address_byte_offset
 
     def add_gap_field(self, gap_size: int):
         self._size += gap_size
@@ -22,9 +22,12 @@ class SyntheticStruct:
         sb_type = self._pointer.GetTarget().FindFirstType(type_name)
         self._add_field(name, sb_type, getter_name)
 
+    def add_sb_type_field(self, name: str, sb_type: SBType, getter_name: str = None):
+        self._add_field(name, sb_type, getter_name)
+
     def add_synthetic_field(self, name: str, synthetic_struct: 'SyntheticStruct'):
         field_byte_offset = self._get_field_byte_offset(synthetic_struct)
-        synthetic_struct.struct_byte_offset = field_byte_offset + self.struct_byte_offset
+        synthetic_struct._address_byte_offset = field_byte_offset + self._address_byte_offset
 
         self._size = field_byte_offset + synthetic_struct.size
         setattr(self, name, lambda: synthetic_struct)
@@ -39,7 +42,7 @@ class SyntheticStruct:
 
     def _field_impl(self, name: str, byte_offset: int, type: SBType) -> SBValue:
         struct_addr = self._pointer.GetValueAsUnsigned() if self._pointer.TypeIsPointerType() else self._pointer.load_addr
-        struct_addr += self.struct_byte_offset
+        struct_addr += self._address_byte_offset
 
         field_addr = struct_addr + byte_offset
 
@@ -66,3 +69,7 @@ class SyntheticStruct:
     @property
     def size(self):
         return self._size
+
+    def get_sibling_aligned_size(self):
+        sibling_offset = self._get_field_byte_offset(self)
+        return sibling_offset
