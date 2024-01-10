@@ -12,7 +12,10 @@ from .qevent import QEventSynth
 from .qfile import qfile_summary, QFileSynth, QTemporaryFileSynth
 from .qfileinfo import qfileinfo_summary, QFileInfoSynth
 from .qflags import qflags_summary
-from .qhash import QHashSynth, QHashIteratorSynth
+from .qhash import qhash_summary, QHashSynth, QHashIteratorSynth
+from .qhostaddress import qhostaddress_summary
+from .qlist import qlist_summary, QListSynth
+from .qlocale import QLocaleSynth
 from .qshareddatapointer import qshareddatapointer_summary, QSharedDataPointerSynth
 from .qstring import qstring_summary, QStringSynth
 from .qtemporarydir import qtemporarydir_summary, QTemporaryDirSynth
@@ -43,6 +46,12 @@ def qt6_lookup_summary(valobj: SBValue, internal_dict):
         return qfileinfo_summary(valobj)
     elif has_cpp_generic_type(valobj, 'QFlags'):
         return qflags_summary(valobj)
+    elif has_cpp_generic_type(valobj, 'QHash'):
+        return qhash_summary(valobj)
+    elif has_cpp_type(valobj, 'QHostAddress'):
+        return qhostaddress_summary(valobj)
+    elif has_cpp_generic_type(valobj, 'QList'):
+        return qlist_summary(valobj)
     elif has_cpp_generic_type(valobj, 'QSharedDataPointer'):
         return qshareddatapointer_summary(valobj)
     elif has_cpp_type(valobj, 'QString'):
@@ -79,6 +88,10 @@ def qt6_lookup_synthetic(valobj: SBValue, internal_dict):
     elif (has_cpp_generic_type(valobj, 'QHash', '::iterator')
           or has_cpp_generic_type(valobj, 'QHash', '::const_iterator')):
         return QHashIteratorSynth(valobj)
+    elif has_cpp_generic_type(valobj, 'QList'):
+        return QListSynth(valobj)
+    elif has_cpp_type(valobj, 'QLocale'):
+        return QLocaleSynth(valobj)
     elif has_cpp_type(valobj, 'QTemporaryFile'):
         return QTemporaryFileSynth(valobj)
     elif has_cpp_generic_type(valobj, 'QSharedDataPointer'):

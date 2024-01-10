@@ -4,6 +4,11 @@ from .typehelpers import TypeHelpers
 from .syntheticstruct import SyntheticStruct
 
 
+def qhash_summary(valobj: SBValue) -> str:
+    size = valobj.GetChildMemberWithName(QHashSynth.PROP_SIZE).GetValueAsUnsigned()
+    return f'size={size}'
+
+
 class QHashSynth(AbstractSynth):
     PROP_SIZE = 'size'
 
