@@ -16,9 +16,14 @@ from .qhash import qhash_summary, QHashSynth, QHashIteratorSynth
 from .qhostaddress import qhostaddress_summary
 from .qlist import qlist_summary, QListSynth
 from .qlocale import QLocaleSynth
+from .qmap import QMapSynth
+from .qscopedpointer import qscopedpointer_summary, QScopedPointerSynth
 from .qshareddatapointer import qshareddatapointer_summary, QSharedDataPointerSynth
+from .qsharedpointer import qsharedpointer_summary, QSharedPointerSynth
 from .qstring import qstring_summary, QStringSynth
 from .qtemporarydir import qtemporarydir_summary, QTemporaryDirSynth
+from .qtime import qtime_summary, QTimeSynth
+from .qtimezone import qtimezone_summary, QTimeZoneSynth
 
 
 def qt6_lookup_summary(valobj: SBValue, internal_dict):
@@ -52,12 +57,20 @@ def qt6_lookup_summary(valobj: SBValue, internal_dict):
         return qhostaddress_summary(valobj)
     elif has_cpp_generic_type(valobj, 'QList'):
         return qlist_summary(valobj)
+    elif has_cpp_generic_type(valobj, 'QScopedPointer'):
+        return qscopedpointer_summary(valobj)
     elif has_cpp_generic_type(valobj, 'QSharedDataPointer'):
         return qshareddatapointer_summary(valobj)
+    elif has_cpp_generic_type(valobj, 'QSharedPointer'):
+        return qsharedpointer_summary(valobj)
     elif has_cpp_type(valobj, 'QString'):
         return qstring_summary(valobj)
     elif has_cpp_type(valobj, 'QTemporaryDir'):
         return qtemporarydir_summary(valobj)
+    elif has_cpp_type(valobj, 'QTime'):
+        return qtime_summary(valobj)
+    elif has_cpp_type(valobj, 'QTimeZone'):
+        return qtimezone_summary(valobj)
 
     return None
 
@@ -92,13 +105,23 @@ def qt6_lookup_synthetic(valobj: SBValue, internal_dict):
         return QListSynth(valobj)
     elif has_cpp_type(valobj, 'QLocale'):
         return QLocaleSynth(valobj)
+    elif has_cpp_generic_type(valobj, 'QMap'):
+        return QMapSynth(valobj)
     elif has_cpp_type(valobj, 'QTemporaryFile'):
         return QTemporaryFileSynth(valobj)
+    elif has_cpp_generic_type(valobj, 'QScopedPointer'):
+        return QScopedPointerSynth(valobj)
     elif has_cpp_generic_type(valobj, 'QSharedDataPointer'):
         return QSharedDataPointerSynth(valobj)
+    elif has_cpp_generic_type(valobj, 'QSharedPointer'):
+        return QSharedPointerSynth(valobj)
     elif has_cpp_type(valobj, 'QString'):
         return QStringSynth(valobj)
     elif has_cpp_type(valobj, 'QTemporaryDir'):
         return QTemporaryDirSynth(valobj)
+    elif has_cpp_type(valobj, 'QTime'):
+        return QTimeSynth(valobj)
+    elif has_cpp_type(valobj, 'QTimeZone'):
+        return QTimeZoneSynth(valobj)
 
     return None
