@@ -21,7 +21,7 @@ def _get_bytes1(val: SBValue) -> bytes:
 
 
 def _get_bytes2(val: SBValue) -> bytes:
-    data = val.GetPointeeData(val.size).sint8s
+    data = val.data.uint8s
     return bytes(data)
 
 
