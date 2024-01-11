@@ -1,6 +1,5 @@
 from typing import Union, SupportsIndex
 
-
 class Field:
     bitpos: int
     enumval: int
