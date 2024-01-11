@@ -24,6 +24,9 @@ from .qstring import qstring_summary, QStringSynth
 from .qtemporarydir import qtemporarydir_summary, QTemporaryDirSynth
 from .qtime import qtime_summary, QTimeSynth
 from .qtimezone import qtimezone_summary, QTimeZoneSynth
+from .qurl import qurl_summary, QUrlSynth
+from .quuid import quuid_summary
+from .qvariant import QVariantSynth
 
 
 def qt6_lookup_summary(valobj: SBValue, internal_dict):
@@ -71,6 +74,10 @@ def qt6_lookup_summary(valobj: SBValue, internal_dict):
         return qtime_summary(valobj)
     elif has_cpp_type(valobj, 'QTimeZone'):
         return qtimezone_summary(valobj)
+    elif has_cpp_type(valobj, 'QUrl'):
+        return qurl_summary(valobj)
+    elif has_cpp_type(valobj, 'QUuid'):
+        return quuid_summary(valobj)
 
     return None
 
@@ -123,5 +130,9 @@ def qt6_lookup_synthetic(valobj: SBValue, internal_dict):
         return QTimeSynth(valobj)
     elif has_cpp_type(valobj, 'QTimeZone'):
         return QTimeZoneSynth(valobj)
+    elif has_cpp_type(valobj, 'QUrl'):
+        return QUrlSynth(valobj)
+    elif has_cpp_type(valobj, 'QVariant'):
+        return QVariantSynth(valobj)
 
     return None

@@ -8,8 +8,10 @@ void DemoQUrl() {
     QUrl u2{"https://user@site.com"};
     QUrl u3{"https://:pass@site.com:0"};
     QUrl u4{"https://:pass@site.com:-1"};
+    QUrl u5{"https://site.com"};
 //    qInfo() << u1.toString();
 //    qInfo() << u2.toString();
 //    qInfo() << u3.toString();
 //    qInfo() << u4.toString();
+//    qInfo() << u5.toString();
 }
