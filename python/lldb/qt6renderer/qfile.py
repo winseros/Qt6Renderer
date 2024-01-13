@@ -85,7 +85,7 @@ class QFilePrivate(SyntheticStruct):
         is32bit = platform_is_32bit(pointer)
         windows = platform_is_windows(pointer)
 
-        if qt().version() >= QtVersion.V6_4_0:
+        if qt().version() >= QtVersion.V6_3_0:
             if windows:
                 offset = 0 if is32bit else 424
             else:

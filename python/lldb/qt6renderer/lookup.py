@@ -27,6 +27,7 @@ from .qtimezone import qtimezone_summary, QTimeZoneSynth
 from .qurl import qurl_summary, QUrlSynth
 from .quuid import quuid_summary
 from .qvariant import QVariantSynth
+from .qweakpointer import qweakpointer_summary, QWeakPointerSynth
 
 
 def qt6_lookup_summary(valobj: SBValue, internal_dict):
@@ -78,6 +79,8 @@ def qt6_lookup_summary(valobj: SBValue, internal_dict):
         return qurl_summary(valobj)
     elif has_cpp_type(valobj, 'QUuid'):
         return quuid_summary(valobj)
+    elif has_cpp_generic_type(valobj, 'QWeakPointer'):
+        return qweakpointer_summary(valobj)
 
     return None
 
@@ -134,5 +137,7 @@ def qt6_lookup_synthetic(valobj: SBValue, internal_dict):
         return QUrlSynth(valobj)
     elif has_cpp_type(valobj, 'QVariant'):
         return QVariantSynth(valobj)
+    elif has_cpp_generic_type(valobj, 'QWeakPointer'):
+        return QWeakPointerSynth(valobj)
 
     return None

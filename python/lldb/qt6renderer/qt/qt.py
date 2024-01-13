@@ -5,6 +5,7 @@ from typing import Union
 
 class QtVersion(IntEnum):
     V6_0_0 = 0x060000
+    V6_3_0 = 0x060300
     V6_4_0 = 0x060400
     V6_6_0 = 0x060600
 

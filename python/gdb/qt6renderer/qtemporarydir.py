@@ -22,7 +22,7 @@ class QTemporaryDirPrinter(StringAndStructurePrinter):
         if qt().version() >= QtVersion.V6_4_0:
             priv = priv.dereference()  # raw pointer since 6.4.0
         else:
-            priv = priv['d'].dereference()  # QScopedPointer
+            priv = priv['d'].dereference()  # QSharedDataPointer
 
         yield QTemporaryDirPrinter.PROP_PATH_OR_ERROR, priv['pathOrError']
         yield QTemporaryDirPrinter.PROP_AUTO_REMOVE, priv['autoRemove']

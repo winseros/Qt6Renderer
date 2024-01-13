@@ -58,6 +58,7 @@ void DemoQHash()
     h5.insert('e', 'f');
 
     auto it1 = h1.begin();
+    auto it1_end = h1.end();
     while (it1 != h1.end())
         ++it1;
     auto it2 = h1.keyBegin();

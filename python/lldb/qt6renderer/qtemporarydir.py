@@ -3,6 +3,7 @@ from lldb import SBValue, eBasicTypeBool
 from .abstractsynth import AbstractSynth
 from .syntheticstruct import SyntheticStruct
 from .qstring import qstring_summary
+from .qt import qt, QtVersion
 
 
 def qtemporarydir_summary(valobj: SBValue) -> str:
@@ -23,7 +24,11 @@ class QTemporaryDirSynth(AbstractSynth):
             return -1
 
     def update(self) -> bool:
-        d = self._valobj.GetChildMemberWithName('d_ptr').GetChildMemberWithName('d')
+        if qt().version() >= QtVersion.V6_4_0:
+            d = self._valobj.GetChildMemberWithName('d_ptr')  # QDirPrivate* since 6.4.0
+        else:
+            d = self._valobj.GetChildMemberWithName('d_ptr').GetChildMemberWithName('d')  # QSharedDataPointer
+
         private = QTemporaryDirPrivate(d)
 
         self._values = [private.path_or_error(), private.auto_remove(), private.success()]
