@@ -4,4 +4,5 @@
 
 void DemoQEvent() {
     QEvent e{QEvent::Type::ActionChanged};
+    QEvent* pe = &e;
 }

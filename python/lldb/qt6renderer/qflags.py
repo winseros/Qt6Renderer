@@ -4,7 +4,7 @@ from .typehelpers import TypeHelpers
 
 
 def qflags_summary(valobj: SBValue) -> str:
-    [enum_type] = TypeHelpers.get_template_types(valobj.type, 1)
+    [enum_type] = TypeHelpers.get_template_types(valobj.type, 1, valobj.target)
 
     i = valobj.GetChildMemberWithName('i').GetValueAsSigned()
 

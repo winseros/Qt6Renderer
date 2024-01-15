@@ -1,19 +1,18 @@
-from lldb import SBType
-import lldb
+from lldb import SBType, SBTarget
 from typing import List
 
 
 class TypeHelpers:
     @staticmethod
-    def get_template_types(t: SBType, max_types: int) -> List[SBType]:
-        if t.num_template_args == 0:
-            result = TypeHelpers._parse_template_types_from_name(t.name, max_types)
+    def get_template_types(type: SBType, max_types: int, target: SBTarget) -> List[SBType]:
+        if type.num_template_args == 0:
+            result = TypeHelpers._parse_template_types_from_name(type.name, max_types, target)
             return result
 
-        return t.template_args
+        return type.template_args
 
     @staticmethod
-    def _parse_template_types_from_name(t_name: str, max_types: int) -> List[SBType]:
+    def _parse_template_types_from_name(t_name: str, max_types: int, target: SBTarget) -> List[SBType]:
         start_index = t_name.find('<')
 
         result = []
@@ -23,7 +22,7 @@ class TypeHelpers:
         for i in range(max_types):
             type_name = TypeHelpers._read_type_name(t_name, start_index + 1)
             type_name = TypeHelpers._normalize_type_name(type_name)
-            sb_type = lldb.target.FindFirstType(type_name)
+            sb_type = target.FindFirstType(type_name)
             result.append(sb_type)
             start_index += len(type_name) + 1
 

@@ -1,4 +1,4 @@
-from lldb import SBValue, eBasicTypeUnsignedLongLong
+from lldb import SBValue, eBasicTypeUnsignedLongLong, eBasicTypeUnsignedInt
 from .abstractsynth import AbstractSynth
 from .syntheticstruct import SyntheticStruct
 
@@ -61,6 +61,8 @@ class QLocalePrivate(SyntheticStruct):
         self._context = context
 
         self.add_sb_type_field('p_data', pointer.target.FindFirstType('void').GetPointerType())
+        self.add_named_type_field('ref', 'QBasicAtomicInt')
+        self.add_basic_type_field('index', eBasicTypeUnsignedInt)
 
         type_num_opts = context.target.FindFirstType(context.type.name + '::NumberOptions')
         if not type_num_opts.IsValid():

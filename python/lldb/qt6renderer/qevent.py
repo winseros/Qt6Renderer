@@ -1,4 +1,4 @@
-from lldb import SBValue, eBasicTypeLongLong
+from lldb import SBValue, eBasicTypeLongLong, eBasicTypeUnsignedShort
 from .abstractsynth import AbstractSynth
 from .syntheticstruct import SyntheticStruct
 
@@ -23,7 +23,12 @@ class QEventSyntheticStruct(SyntheticStruct):
     def __init__(self, pointer: SBValue):
         super().__init__(pointer)
         self.add_basic_type_field('unknown', eBasicTypeLongLong)
-        self.add_named_type_field(QEventSyntheticStruct.PROP_TYPE, 'QEvent::Type')
+
+        t_event_type = pointer.target.FindFirstType('QEvent::Type')
+        if t_event_type.IsValid():
+            self.add_sb_type_field(QEventSyntheticStruct.PROP_TYPE, t_event_type)
+        else:
+            self.add_basic_type_field(QEventSyntheticStruct.PROP_TYPE, eBasicTypeUnsignedShort)
 
     def unknown(self) -> SBValue:
         pass

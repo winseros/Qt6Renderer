@@ -34,7 +34,7 @@ class QHashSynth(AbstractSynth):
         nspans = int((num_buckets + 127) / 128)
         p_span = d.GetChildMemberWithName('spans')
 
-        [t_key, t_value] = TypeHelpers.get_template_types(self._valobj.type, 2)
+        [t_key, t_value] = TypeHelpers.get_template_types(self._valobj.type, 2, self._valobj.target)
         entry_size = KeyValuePair(self._valobj, t_key, t_value, 0).get_sibling_aligned_size()
 
         for b in range(nspans):
@@ -79,7 +79,7 @@ class QHashIteratorSynth(AbstractSynth):
             self._values = [self._valobj.CreateValueFromData(QHashIteratorSynth.PROP_END, sb_data, sb_type)]
             return False  # iterator has ended
 
-        [t_key, t_value] = TypeHelpers.get_template_types(self._valobj.type, 2)
+        [t_key, t_value] = TypeHelpers.get_template_types(self._valobj.type, 2, self._valobj.target)
 
         bucket = i.GetChildMemberWithName('bucket').GetValueAsUnsigned()
         p_span = d.GetChildMemberWithName('spans')

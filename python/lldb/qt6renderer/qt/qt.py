@@ -1,4 +1,4 @@
-import lldb
+from lldb import SBTarget
 from enum import IntEnum
 from typing import Union
 
@@ -15,14 +15,14 @@ class QtTiVersion(IntEnum):
 
 
 class Qt:
-    def version(self) -> Union[int, None]:
+    def version(self, target: SBTarget) -> Union[int, None]:
         # Only available with Qt 5.3+
-        hook_data = lldb.target.FindFirstGlobalVariable('qtHookData')
+        hook_data = target.FindFirstGlobalVariable('qtHookData')
         if not hook_data.IsValid():
             return None
 
         qt_version = hook_data.GetPointeeData(2, 1).uint64s[0]
-        self.version = lambda: qt_version
+        self.version = lambda x: qt_version
         return qt_version
 
 

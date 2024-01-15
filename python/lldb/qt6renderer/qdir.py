@@ -5,6 +5,7 @@ from .qfilesystementry import QFileSystemEntry
 from .qstring import qstring_summary
 from .platformhelpers import platform_is_32bit
 from .syntheticstruct import SyntheticStruct
+from .qshareddatapointer import QSharedDataPointer
 
 
 def qdir_summary(valobj):
@@ -30,18 +31,17 @@ class QDirSynth(AbstractSynth):
             return -1
 
     def update(self):
-        priv = QDirPrivate(self._valobj.GetChildMemberWithName('d_ptr').GetChildMemberWithName('d'))
+        dir = QDir(self._valobj)
 
-        path = self._valobj.CreateValueFromData(QDirSynth.PROP_PATH, priv.path().file_path().data,
-                                                priv.path().file_path().type)
+        file_path = dir.d_ptr().d().path().file_path()
+        path = self._valobj.CreateValueFromData(QDirSynth.PROP_PATH, file_path.data, file_path.type)
         self._values = [path]
 
         # warm up caches; does not work on Windows
         self._valobj.EvaluateExpression('absolutePath()')
 
-        absolute_path = self._valobj.CreateValueFromData(QDirSynth.PROP_ABSOLUTE_PATH,
-                                                         priv.abs_path().file_path().data,
-                                                         priv.abs_path().file_path().type)
+        abs_path = dir.d_ptr().d().abs_path().file_path()
+        absolute_path = self._valobj.CreateValueFromData(QDirSynth.PROP_ABSOLUTE_PATH, abs_path.data, abs_path.type)
         self._values.append(absolute_path)
 
         # the below code does not work on Windows; due to outdated LLDB, I guess
@@ -69,7 +69,7 @@ class QDirPrivate(SyntheticStruct):
     def _get_offset(self):
         bit32 = platform_is_32bit(self._pointer)
 
-        if qt().version() >= QtVersion.V6_6_0:
+        if qt().version(self._pointer.target) >= QtVersion.V6_6_0:
             if bit32:
                 offset = 24
             else:
@@ -81,3 +81,12 @@ class QDirPrivate(SyntheticStruct):
                 offset = 96
 
         return offset
+
+
+class QDir(SyntheticStruct):
+    def __init__(self, pointer: SBValue):
+        super().__init__(pointer)
+        self.add_synthetic_field('d_ptr', QSharedDataPointer(pointer, QDirPrivate))
+
+    def d_ptr(self) -> QSharedDataPointer[QDirPrivate]:
+        pass

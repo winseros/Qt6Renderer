@@ -1,5 +1,5 @@
 from lldb import SBValue
-from qt6renderer.syntheticstruct import SyntheticStruct
+from .syntheticstruct import SyntheticStruct
 
 
 class QFileSystemEntry(SyntheticStruct):

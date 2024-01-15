@@ -31,7 +31,7 @@ from .qweakpointer import qweakpointer_summary, QWeakPointerSynth
 
 
 def qt6_lookup_summary(valobj: SBValue, internal_dict):
-    qt_version = qt().version()
+    qt_version = qt().version(valobj.target)
     if not qt_version or qt_version < QtVersion.V6_0_0:
         return None
 
@@ -86,7 +86,7 @@ def qt6_lookup_summary(valobj: SBValue, internal_dict):
 
 
 def qt6_lookup_synthetic(valobj: SBValue, internal_dict):
-    qt_version = qt().version()
+    qt_version = qt().version(valobj.target)
     if not qt_version or qt_version < QtVersion.V6_0_0:
         return None
 

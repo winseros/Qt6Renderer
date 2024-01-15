@@ -24,7 +24,7 @@ class QTemporaryDirSynth(AbstractSynth):
             return -1
 
     def update(self) -> bool:
-        if qt().version() >= QtVersion.V6_4_0:
+        if qt().version(self._valobj.target) >= QtVersion.V6_4_0:
             d = self._valobj.GetChildMemberWithName('d_ptr')  # QDirPrivate* since 6.4.0
         else:
             d = self._valobj.GetChildMemberWithName('d_ptr').GetChildMemberWithName('d')  # QSharedDataPointer
