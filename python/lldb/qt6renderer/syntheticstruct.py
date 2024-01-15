@@ -1,13 +1,12 @@
-from lldb import SBValue, SBType
+from lldb import SBValue, SBType, eBasicTypeInt
 from math import ceil
-from typing import Union
+from typing import Union, Callable
 
 
 class SyntheticStruct:
-    def __init__(self, pointer: SBValue, address_byte_offset=0):
+    def __init__(self, pointer: SBValue):
         self._pointer = pointer
         self._size = 0
-        self._address_byte_offset = address_byte_offset
 
     def add_gap_field(self, gap_size: int):
         self._size += gap_size
@@ -25,11 +24,22 @@ class SyntheticStruct:
     def add_sb_type_field(self, name: str, sb_type: SBType, getter_name: str = None):
         self._add_field(name, sb_type, getter_name)
 
-    def add_synthetic_field(self, name: str, synthetic_struct: 'SyntheticStruct'):
-        field_byte_offset = self._get_field_byte_offset(synthetic_struct)
-        synthetic_struct._address_byte_offset = field_byte_offset + self._address_byte_offset
+    def add_synthetic_field(self, name: str, synthetic_struct_ctor: Callable[[SBValue], 'SyntheticStruct'],
+                            pointer=False):
+        if pointer:
+            sb_ptr_t = self._pointer.target.GetBasicType(eBasicTypeInt).GetPointerType()
+            field_byte_offset = self._get_field_byte_offset(sb_ptr_t)
+            self._size = field_byte_offset + sb_ptr_t.size
+            field_addr = self._get_struct_addr()
+            struct_ptr = self._pointer.CreateValueFromAddress(name, field_addr + field_byte_offset, sb_ptr_t)
+            synthetic_struct = synthetic_struct_ctor(struct_ptr)
+        else:
+            synthetic_struct = synthetic_struct_ctor(self._pointer)
+            field_byte_offset = self._get_field_byte_offset(synthetic_struct)
+            if field_byte_offset:
+                synthetic_struct.offset_struct_addr_by(field_byte_offset)
+            self._size = field_byte_offset + synthetic_struct.size
 
-        self._size = field_byte_offset + synthetic_struct.size
         setattr(self, name, lambda: synthetic_struct)
 
     def _add_field(self, name: str, type: SBType, getter_name: str):
@@ -41,8 +51,7 @@ class SyntheticStruct:
         setattr(self, getter_name, lambda: self._field_impl(name, byte_offset, type))
 
     def _field_impl(self, name: str, byte_offset: int, type: SBType) -> SBValue:
-        struct_addr = self._pointer.GetValueAsUnsigned() if self._pointer.TypeIsPointerType() else self._pointer.load_addr
-        struct_addr += self._address_byte_offset
+        struct_addr = self._get_struct_addr()
 
         field_addr = struct_addr + byte_offset
 
@@ -65,6 +74,17 @@ class SyntheticStruct:
             alignment *= 2
 
         return alignment
+
+    def offset_struct_addr_by(self, offset_in_bytes: int):
+        struct_addr = self._get_struct_addr()
+        struct_addr += offset_in_bytes
+
+        sb_int = self._pointer.target.FindFirstType('int')
+        self._pointer = self._pointer.CreateValueFromAddress(self._pointer.name, struct_addr, sb_int)
+
+    def _get_struct_addr(self) -> int:
+        struct_addr = self._pointer.GetValueAsUnsigned() if self._pointer.TypeIsPointerType() else self._pointer.load_addr
+        return struct_addr
 
     @property
     def size(self):

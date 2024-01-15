@@ -35,7 +35,7 @@ class QHashSynth(AbstractSynth):
         p_span = d.GetChildMemberWithName('spans')
 
         [t_key, t_value] = TypeHelpers.get_template_types(self._valobj.type, 2, self._valobj.target)
-        entry_size = KeyValuePair(self._valobj, t_key, t_value, 0).get_sibling_aligned_size()
+        entry_size = KeyValuePair(self._valobj, t_key, t_value).get_sibling_aligned_size()
 
         for b in range(nspans):
             span = self._valobj.CreateValueFromAddress('span', p_span.load_addr + b * p_span.size,
@@ -47,7 +47,9 @@ class QHashSynth(AbstractSynth):
             for i in range(128):
                 offset = offsets[i]
                 if offset != 255:
-                    pair = KeyValuePair(entries, t_key, t_value, offset * entry_size)
+                    pair = KeyValuePair(entries, t_key, t_value)
+                    pair.offset_struct_addr_by(offset * entry_size)
+
                     self._values.append(pair.k())
                     self._values.append(pair.v())
 
@@ -92,15 +94,16 @@ class QHashIteratorSynth(AbstractSynth):
         offsets = span.GetChildMemberWithName('offsets').data.uint8s
         entries = span.GetChildMemberWithName('entries')
 
-        entry_size = KeyValuePair(entries, t_key, t_value, 0).get_sibling_aligned_size()
-        pair = KeyValuePair(entries, t_key, t_value, offsets[index_offset] * entry_size)
+        pair = KeyValuePair(entries, t_key, t_value)
+        entry_size = pair.get_sibling_aligned_size()
+        pair.offset_struct_addr_by(offsets[index_offset] * entry_size)
 
         self._values = [pair.k(), pair.v()]
 
 
 class KeyValuePair(SyntheticStruct):
-    def __init__(self, pointer: SBValue, t_key: SBType, t_value: SBType, address_byte_offset):
-        super().__init__(pointer, address_byte_offset)
+    def __init__(self, pointer: SBValue, t_key: SBType, t_value: SBType):
+        super().__init__(pointer)
         self.add_sb_type_field('k', t_key)
         self.add_sb_type_field('v', t_value)
 

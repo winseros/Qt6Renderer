@@ -57,8 +57,8 @@ class QDirPrivate(SyntheticStruct):
     def __init__(self, pointer: SBValue):
         super().__init__(pointer)
         self.add_gap_field(self._get_offset())
-        self.add_synthetic_field('path', QFileSystemEntry(pointer))
-        self.add_synthetic_field('abs_path', QFileSystemEntry(pointer))
+        self.add_synthetic_field('path', lambda p: QFileSystemEntry(p))
+        self.add_synthetic_field('abs_path', lambda p: QFileSystemEntry(p))
 
     def path(self) -> QFileSystemEntry:
         pass
@@ -86,7 +86,7 @@ class QDirPrivate(SyntheticStruct):
 class QDir(SyntheticStruct):
     def __init__(self, pointer: SBValue):
         super().__init__(pointer)
-        self.add_synthetic_field('d_ptr', QSharedDataPointer(pointer, QDirPrivate))
+        self.add_synthetic_field('d_ptr', lambda p: QSharedDataPointer[QDirPrivate](p, lambda q: QDirPrivate(q)))
 
     def d_ptr(self) -> QSharedDataPointer[QDirPrivate]:
         pass
