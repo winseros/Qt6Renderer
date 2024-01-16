@@ -4,6 +4,7 @@ from .abstractsynth import AbstractSynth
 from .qt import qt, QtVersion
 from .platformhelpers import platform_is_32bit, platform_is_windows
 from .syntheticstruct import SyntheticStruct
+from .qshareddatapointer import QSharedDataPointer
 
 
 def qfile_summary(valobj):
@@ -24,9 +25,8 @@ class QFileSynth(AbstractSynth):
             return -1
 
     def update(self):
-        d = self._get_private()
-        private = QFilePrivate(d)
-        self._values = [private.file_name()]
+        file = self._get_internal()
+        self._values = [file.d_ptr().d().file_name()]
 
         # the below code does not work on Windows; due to outdated LLDB, I guess
         exists = self._valobj.EvaluateExpression('exists()')
@@ -36,37 +36,8 @@ class QFileSynth(AbstractSynth):
 
         return False
 
-    def _get_private(self) -> SBValue:
-        return self._valobj.GetChildAtIndex(0) \
-            .GetChildAtIndex(0) \
-            .GetChildAtIndex(0) \
-            .GetChildMemberWithName('d_ptr') \
-            .GetChildMemberWithName('d')
-
-
-class QTemporaryFileSynth(QFileSynth):
-    def get_child_index(self, name: str) -> int:
-        index = super().get_child_index(name)
-        if index >= 0:
-            return index
-        else:
-            if name == QTemporaryFilePrivate.PROP_AUTO_REMOVE:
-                return self.num_children() - 2
-            elif name == QTemporaryFilePrivate.PROP_TEMPLATE_NAME:
-                return self.num_children() - 1
-            else:
-                return -1
-
-    def update(self):
-        super().update()
-
-        d = self._get_private()
-        private = QTemporaryFilePrivate(d)
-
-        self._values.append(private.auto_remove())
-        self._values.append(private.template_name())
-
-        return False
+    def _get_internal(self):
+        return QFile(self._valobj)
 
 
 class QFilePrivate(SyntheticStruct):
@@ -85,7 +56,7 @@ class QFilePrivate(SyntheticStruct):
         is32bit = platform_is_32bit(pointer)
         windows = platform_is_windows(pointer)
 
-        if qt().version() >= QtVersion.V6_3_0:
+        if qt().version(pointer.target) >= QtVersion.V6_3_0:
             if windows:
                 offset = 0 if is32bit else 424
             else:
@@ -97,6 +68,44 @@ class QFilePrivate(SyntheticStruct):
                 offset = 196 if is32bit else 304
 
         return offset
+
+
+class QFile(SyntheticStruct):
+
+    def __init__(self, pointer: SBValue):
+        super().__init__(pointer)
+        self.add_gap_field(pointer.target.GetAddressByteSize())
+        self.add_synthetic_field('d_ptr', lambda p: QSharedDataPointer(p, lambda q: QFilePrivate(q)))
+
+    def d_ptr(self) -> QSharedDataPointer[QFilePrivate]:
+        pass
+
+
+class QTemporaryFileSynth(QFileSynth):
+    def get_child_index(self, name: str) -> int:
+        index = super().get_child_index(name)
+        if index >= 0:
+            return index
+        else:
+            if name == QTemporaryFilePrivate.PROP_AUTO_REMOVE:
+                return self.num_children() - 2
+            elif name == QTemporaryFilePrivate.PROP_TEMPLATE_NAME:
+                return self.num_children() - 1
+            else:
+                return -1
+
+    def update(self):
+        super().update()
+
+        tf = self._get_internal()
+
+        self._values.append(tf.d_ptr().d().auto_remove())
+        self._values.append(tf.d_ptr().d().template_name())
+
+        return False
+
+    def _get_internal(self):
+        return QTemporaryFile(self._valobj)
 
 
 class QTemporaryFilePrivate(QFilePrivate):
@@ -113,4 +122,14 @@ class QTemporaryFilePrivate(QFilePrivate):
         pass
 
     def template_name(self) -> SBValue:
+        pass
+
+
+class QTemporaryFile(SyntheticStruct):
+    def __init__(self, pointer: SBValue):
+        super().__init__(pointer)
+        self.add_gap_field(pointer.target.GetAddressByteSize())
+        self.add_synthetic_field('d_ptr', lambda p: QSharedDataPointer(p, lambda q: QTemporaryFilePrivate(q)))
+
+    def d_ptr(self) -> QSharedDataPointer[QTemporaryFilePrivate]:
         pass

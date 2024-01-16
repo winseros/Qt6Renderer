@@ -1,8 +1,10 @@
-from lldb import SBValue, eBasicTypeBool
+from lldb import SBValue
 from .abstractsynth import AbstractSynth
 from .qshareddata import QSharedData
 from .qfilesystementry import QFileSystemEntry
 from .qstring import qstring_summary
+from .syntheticstruct import SyntheticStruct
+from .qshareddatapointer import QSharedDataPointer
 
 
 def qfileinfo_summary(valobj: SBValue) -> str:
@@ -51,10 +53,9 @@ class QFileInfoSynth(AbstractSynth):
             return -1
 
     def update(self) -> bool:
-        d = self._valobj.GetChildMemberWithName('d_ptr').GetChildMemberWithName('d')
-        private = QFileInfoPrivate(d)
+        fi = QFileInfo(self._valobj)
 
-        file_path = private.file_entry().file_path()
+        file_path = fi.d_ptr().d().file_entry().file_path()
         self._values = [self._valobj.CreateValueFromData(QFileInfoSynth.PROP_PATH, file_path.data, file_path.type)]
 
         [self._try_add_property(x) for x in [QFileInfoSynth.PROP_CACHING, QFileInfoSynth.PROP_EXISTS,
@@ -74,7 +75,16 @@ class QFileInfoSynth(AbstractSynth):
 class QFileInfoPrivate(QSharedData):
     def __init__(self, pointer: SBValue):
         super().__init__(pointer)
-        self.add_synthetic_field('file_entry', QFileSystemEntry(pointer))
+        self.add_synthetic_field('file_entry', lambda p: QFileSystemEntry(p))
 
     def file_entry(self) -> QFileSystemEntry:
+        pass
+
+
+class QFileInfo(SyntheticStruct):
+    def __init__(self, pointer: SBValue):
+        super().__init__(pointer)
+        self.add_synthetic_field('d_ptr', lambda p: QSharedDataPointer(p, lambda q: QFileInfoPrivate(q)))
+
+    def d_ptr(self) -> QSharedDataPointer[QFileInfoPrivate]:
         pass

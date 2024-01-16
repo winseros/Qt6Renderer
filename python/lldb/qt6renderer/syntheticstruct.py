@@ -28,16 +28,25 @@ class SyntheticStruct:
                             pointer=False):
         if pointer:
             sb_ptr_t = self._pointer.target.GetBasicType(eBasicTypeInt).GetPointerType()
+
             field_byte_offset = self._get_field_byte_offset(sb_ptr_t)
-            self._size = field_byte_offset + sb_ptr_t.size
             field_addr = self._get_struct_addr()
             struct_ptr = self._pointer.CreateValueFromAddress(name, field_addr + field_byte_offset, sb_ptr_t)
             synthetic_struct = synthetic_struct_ctor(struct_ptr)
+
+            self._size = field_byte_offset + sb_ptr_t.size
         else:
             synthetic_struct = synthetic_struct_ctor(self._pointer)
             field_byte_offset = self._get_field_byte_offset(synthetic_struct)
+
             if field_byte_offset:
-                synthetic_struct.offset_struct_addr_by(field_byte_offset)
+                sb_int = self._pointer.target.GetBasicType(eBasicTypeInt)
+                sb_field_name = f'{self._pointer.name}.{hex(field_byte_offset)}'
+                struct_addr = self._get_struct_addr()
+                sb_pointer = self._pointer.CreateValueFromAddress(sb_field_name, struct_addr + field_byte_offset,
+                                                                  sb_int)
+                synthetic_struct = synthetic_struct_ctor(sb_pointer)
+
             self._size = field_byte_offset + synthetic_struct.size
 
         setattr(self, name, lambda: synthetic_struct)
@@ -74,13 +83,6 @@ class SyntheticStruct:
             alignment *= 2
 
         return alignment
-
-    def offset_struct_addr_by(self, offset_in_bytes: int):
-        struct_addr = self._get_struct_addr()
-        struct_addr += offset_in_bytes
-
-        sb_int = self._pointer.target.FindFirstType('int')
-        self._pointer = self._pointer.CreateValueFromAddress(self._pointer.name, struct_addr, sb_int)
 
     def _get_struct_addr(self) -> int:
         struct_addr = self._pointer.GetValueAsUnsigned() if self._pointer.TypeIsPointerType() else self._pointer.load_addr

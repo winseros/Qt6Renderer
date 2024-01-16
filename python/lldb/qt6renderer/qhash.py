@@ -1,4 +1,4 @@
-from lldb import SBData, SBType, SBValue, eBasicTypeBool, eBasicTypeUnsignedLongLong
+from lldb import SBData, SBType, SBValue, eBasicTypeBool, eBasicTypeUnsignedLongLong, eBasicTypeInt
 from .abstractsynth import AbstractSynth
 from .typehelpers import TypeHelpers
 from .syntheticstruct import SyntheticStruct
@@ -37,18 +37,20 @@ class QHashSynth(AbstractSynth):
         [t_key, t_value] = TypeHelpers.get_template_types(self._valobj.type, 2, self._valobj.target)
         entry_size = KeyValuePair(self._valobj, t_key, t_value).get_sibling_aligned_size()
 
+        sb_int = self._valobj.target.GetBasicType(eBasicTypeInt)
+
         for b in range(nspans):
             span = self._valobj.CreateValueFromAddress('span', p_span.load_addr + b * p_span.size,
                                                        p_span.type).Dereference()
 
             offsets = span.GetChildMemberWithName('offsets').data.uint8s
-            entries = span.GetChildMemberWithName('entries')
+            entries_addr = span.GetChildMemberWithName('entries').GetValueAsUnsigned()
 
             for i in range(128):
                 offset = offsets[i]
                 if offset != 255:
-                    pair = KeyValuePair(entries, t_key, t_value)
-                    pair.offset_struct_addr_by(offset * entry_size)
+                    sb_pair = self._valobj.CreateValueFromAddress('pair', entries_addr + offset * entry_size, sb_int)
+                    pair = KeyValuePair(sb_pair, t_key, t_value)
 
                     self._values.append(pair.k())
                     self._values.append(pair.v())
@@ -83,6 +85,9 @@ class QHashIteratorSynth(AbstractSynth):
 
         [t_key, t_value] = TypeHelpers.get_template_types(self._valobj.type, 2, self._valobj.target)
 
+        entry_size = KeyValuePair(self._valobj, t_key, t_value).get_sibling_aligned_size()
+        sb_int = self._valobj.target.GetBasicType(eBasicTypeInt)
+
         bucket = i.GetChildMemberWithName('bucket').GetValueAsUnsigned()
         p_span = d.GetChildMemberWithName('spans')
 
@@ -92,11 +97,10 @@ class QHashIteratorSynth(AbstractSynth):
 
         index_offset = bucket & 127
         offsets = span.GetChildMemberWithName('offsets').data.uint8s
-        entries = span.GetChildMemberWithName('entries')
+        entries_addr = span.GetChildMemberWithName('entries').GetValueAsUnsigned()
 
-        pair = KeyValuePair(entries, t_key, t_value)
-        entry_size = pair.get_sibling_aligned_size()
-        pair.offset_struct_addr_by(offsets[index_offset] * entry_size)
+        sb_pair = self._valobj.CreateValueFromAddress('pair', entries_addr + offsets[index_offset] * entry_size, sb_int)
+        pair = KeyValuePair(sb_pair, t_key, t_value)
 
         self._values = [pair.k(), pair.v()]
 
