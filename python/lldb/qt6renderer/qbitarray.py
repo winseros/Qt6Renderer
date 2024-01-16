@@ -5,7 +5,7 @@ from .abstractsynth import AbstractSynth
 def qbitarray_summary(valobj: SBValue):
     child_count = valobj.GetNumChildren()
     if child_count == 1:
-        return ''
+        return 'size=0'
 
     text = ''
     for i in range(0, child_count - QBitArraySynth.RANGE_START_OFFSET):
