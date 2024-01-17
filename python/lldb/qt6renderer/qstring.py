@@ -3,11 +3,19 @@ from .qarraydatapointer import QArrayDataPointerSynth
 
 
 def qstring_summary_no_quotes(valobj: SBValue) -> str:
-    size = valobj.GetChildMemberWithName(QArrayDataPointerSynth.PROP_SIZE).GetValueAsSigned()
+    sb_size = valobj.GetChildMemberWithName(QArrayDataPointerSynth.PROP_SIZE)
+    if not sb_size:
+        return ''
+
+    size = sb_size.GetValueAsSigned()
     if not size:
         return ''
 
-    data = valobj.GetChildMemberWithName(QArrayDataPointerSynth.PROP_RAW_DATA).GetPointeeData(0, size).sint16s
+    sb_raw = valobj.GetChildMemberWithName(QArrayDataPointerSynth.PROP_RAW_DATA)
+    if not sb_raw:
+        return ''
+
+    data = sb_raw.GetPointeeData(0, size).sint16s
 
     result = ''
     for code in data:

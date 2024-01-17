@@ -3,20 +3,34 @@ from .qarraydatapointer import QArrayDataPointerSynth
 
 
 def qbytearray_summary(valobj: SBValue):
-    size = valobj.GetChildMemberWithName(QArrayDataPointerSynth.PROP_SIZE).GetValueAsSigned()
+    sb_size = valobj.GetChildMemberWithName(QArrayDataPointerSynth.PROP_SIZE)
+    if not sb_size:
+        return 'size=0'
+
+    size = sb_size.GetValueAsSigned()
     return f'size={size}'
 
+
 def qbytearray_string_summary(valobj: SBValue):
-    size = valobj.GetChildMemberWithName(QArrayDataPointerSynth.PROP_SIZE).GetValueAsSigned()
+    sb_size = valobj.GetChildMemberWithName(QArrayDataPointerSynth.PROP_SIZE)
+    if not sb_size:
+        return '""'
+
+    size = sb_size.GetValueAsSigned()
     if not size:
         return '""'
 
-    data = valobj.GetChildMemberWithName(QArrayDataPointerSynth.PROP_RAW_DATA).GetPointeeData(0, size).sint8s
+    sb_raw = valobj.GetChildMemberWithName(QArrayDataPointerSynth.PROP_RAW_DATA)
+    if not sb_raw:
+        return '""'
+
+    data = sb_raw.GetPointeeData(0, size).sint8s
 
     result = ''
     for code in data:
         result += chr(code)
     return result
+
 
 class QByteArraySynth(QArrayDataPointerSynth):
     pass

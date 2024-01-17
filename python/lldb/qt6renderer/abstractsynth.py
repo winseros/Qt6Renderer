@@ -1,6 +1,6 @@
 from lldb import SBValue
 from abc import abstractmethod
-
+from typing import Union
 
 class AbstractSynth:
     def __init__(self, valobj: SBValue):
@@ -13,7 +13,7 @@ class AbstractSynth:
     def num_children(self) -> int:
         return len(self._values)
 
-    def get_child_at_index(self, index: int) -> SBValue:
+    def get_child_at_index(self, index: int) -> Union[SBValue, None]:
         return self._values[index] if index < len(self._values) else None
 
     @abstractmethod

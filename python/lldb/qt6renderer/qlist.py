@@ -4,7 +4,11 @@ from .abstractsynth import AbstractSynth
 
 
 def qlist_summary(valobj: SBValue) -> str:
-    size = valobj.GetChildMemberWithName(QArrayDataPointerSynth.PROP_SIZE).GetValueAsUnsigned()
+    sb_size = valobj.GetChildMemberWithName(QArrayDataPointerSynth.PROP_SIZE)
+    if not sb_size:
+        return 'size=0'
+
+    size = sb_size.GetValueAsUnsigned()
     return f'size={size}'
 
 
