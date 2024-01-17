@@ -16,10 +16,11 @@ void DemoQHash()
     h1.insert("k9", "v9");
     h1.insert("k10", "v10");
 
-    QHash<QChar, QString> h11;
-    h11.insert('1', "v1");
-    h11.insert('2', "v2");
-    h11.insert('3', "v3");
+    QHash<QChar, QString> h11{
+        std::pair<QChar, QString>('1', "v1"),
+        std::pair<QChar, QString>('2', "v2"),
+        std::pair<QChar, QString>('3', "v3")
+    };
 
     QHash<QString, QChar> h12;
     h12.insert("k1", '1');
@@ -57,12 +58,12 @@ void DemoQHash()
     h5.insert('c', 'd');
     h5.insert('e', 'f');
 
-    auto it1 = h1.begin();
+    /*auto it1 = h1.begin();
     auto it1_end = h1.end();
     while (it1 != h1.end())
         ++it1;
     auto it2 = h1.keyBegin();
     auto it3 = h1.keyValueBegin();
     auto it4 = h1.constBegin();
-    auto it5 = h1.constKeyValueBegin();
+    auto it5 = h1.constKeyValueBegin();*/
 }

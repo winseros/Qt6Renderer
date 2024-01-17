@@ -22,12 +22,18 @@ class QHashSynth(AbstractSynth):
         d = self._valobj.GetChildMemberWithName('d')
         if not d.GetValueAsUnsigned():
             sb_type = self._valobj.target.GetBasicType(eBasicTypeUnsignedLongLong)
-            sb_data = SBData.CreateDataFromInt(0)
+            sb_data = SBData.CreateDataFromUInt64Array(self._valobj.target.byte_order, self._valobj.target.addr_size,
+                                                       [0])
             self._values = [self._valobj.CreateValueFromData(QHashSynth.PROP_SIZE, sb_data, sb_type)]
             return False
 
         size = d.GetChildMemberWithName(QHashSynth.PROP_SIZE)
         self._values = [size]
+
+        num_buckets = d.GetChildMemberWithName('numBuckets').GetValueAsUnsigned()
+        if num_buckets > self._max_num_buckets():
+            # half-initialized structure
+            return False
 
         num_buckets = d.GetChildMemberWithName('numBuckets').GetValueAsUnsigned()
 
@@ -56,6 +62,11 @@ class QHashSynth(AbstractSynth):
                     self._values.append(pair.v())
 
         return False
+
+    def _max_num_buckets(self) -> int:
+        # return size_t(1) << (8 * sizeof(size_t) - 1);
+        size_t = self._valobj.target.FindFirstType('size_t')
+        return 1 << (8 * size_t.size - 1)
 
 
 class QHashIteratorSynth(AbstractSynth):
