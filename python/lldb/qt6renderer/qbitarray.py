@@ -42,17 +42,17 @@ class QBitArraySynth(AbstractSynth):
         d_d = self._valobj.GetChildMemberWithName('d').GetChildMemberWithName('d')
         d_d_size = d_d.GetChildMemberWithName(QBitArraySynth.PROP_SIZE)
 
-        self._values = [d_d_size]
-
-        if d_d_size:
+        if d_d_size.GetValueAsUnsigned():
             d_d_size_v = d_d_size.GetValueAsSigned()
 
             d_d_ptr = d_d.GetChildMemberWithName('ptr')
             d_d_bytes = d_d_ptr.GetPointeeData(0, d_d_size_v).sint8s
-            # if not data.IsValid()
 
             d_bits_val = (d_d_size_v << 3) - d_d_bytes[
                 0]  # the 1st byte represents the number of unused bits in the last byte
+
+            size_d = SBData.CreateDataFromUInt64Array(self._valobj.target.byte_order, self._valobj.target.addr_size, [d_bits_val])
+            self._values = [self._valobj.CreateValueFromData(QBitArraySynth.PROP_SIZE, size_d, d_d_size.type)]
 
             if d_bits_val:
                 bit_index_global = 0
@@ -68,5 +68,7 @@ class QBitArraySynth(AbstractSynth):
 
                         bit_index_in_byte += 1
                         bit_index_global += 1
+        else:
+            self._values = [d_d_size]
 
-            return False
+        return False
