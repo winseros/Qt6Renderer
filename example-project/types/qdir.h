@@ -11,4 +11,5 @@ void DemoQDir() {
 
     QTemporaryDir td;
     QDir d3{td.path()};
+    const auto d3ap = d3.absolutePath();
 }

@@ -18,6 +18,7 @@ void DemoQList() {
         QSharedPointer<QString>(new QString("s3")),
     });
     QList<qint64> list4;
+    list4.reserve(10);
     QList list5({
         UnalignedStruct{1, 'a'},
         UnalignedStruct{2, 'b'},
@@ -25,5 +26,6 @@ void DemoQList() {
     });
 
     auto it = list1.begin();
+    auto it_end = list1.end();
     const auto cit = list1.constBegin();
 }

@@ -22,20 +22,26 @@ def _get_value_byte_alignment(t_key: Type, t_value: Type) -> int:
 
 
 class QHashPrinter(StringAndStructurePrinter):
+    PROP_SIZE = 'size'
+
     def to_string(self) -> str:
         d = self._valobj['d'].dereference()
         size = d['size']
-        return f'size={size}'
+        return f'{QHashPrinter.PROP_SIZE}={size}'
 
     def children(self) -> Iterable[Tuple[str, Value]]:
-        p_type_key, p_type_value, v_alignment = _get_key_value_types(self._valobj.type)
-        t_char = lookup_type('char').pointer()
+        d = self._valobj['d']
+        if not d:
+            raise StopIteration
 
-        d = self._valobj['d'].dereference()
+        d = d.dereference()
 
         num_buckets = int(d['numBuckets'])
         nspans = int((num_buckets + 127) / 128)
         p_span = d['spans']
+
+        p_type_key, p_type_value, v_alignment = _get_key_value_types(self._valobj.type)
+        t_char = lookup_type('char').pointer()
 
         for b in range(nspans):
             span = (p_span + b).dereference()
@@ -63,7 +69,7 @@ class QHashIteratorPrinter(StructureOnlyPrinter):
         d = i['d']
         if not d:
             yield QHashIteratorPrinter.PROP_END, True
-            return
+            raise StopIteration
 
         parent_type = QHashIteratorPrinter._get_parent_type(self._valobj.type)
         p_type_key, p_type_value, v_alignment = _get_key_value_types(parent_type)

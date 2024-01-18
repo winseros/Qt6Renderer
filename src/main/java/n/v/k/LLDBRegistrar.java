@@ -24,7 +24,7 @@ class LLDBRegistrar {
         long threadId = process.getCurrentThreadId();
         int frameIndex = process.getCurrentFrameIndex();
 
-        debuggerDriver.executeInterpreterCommand(threadId, frameIndex, String.format("command script import \"%s/lookup.py\"", escapedPath));
+        debuggerDriver.executeInterpreterCommand(threadId, frameIndex, String.format("command script import \"%s/qt6renderer\"", escapedPath));
 
         registerSummary(debuggerDriver, threadId, frameIndex, "QAtomicInt", false);
         registerSummary(debuggerDriver, threadId, frameIndex, "QBasicAtomicInt", false);
@@ -42,8 +42,10 @@ class LLDBRegistrar {
         registerSummary(debuggerDriver, threadId, frameIndex, "QHostAddress", false);
         registerBoth(debuggerDriver, threadId, frameIndex, "QList", true);
         registerSynth(debuggerDriver, threadId, frameIndex, "QLocale", false);
-//                registerBoth(debuggerDriver, threadId, frameIndex, "QMap", true);
+        registerSynth(debuggerDriver, threadId, frameIndex, "QMap", true);
+        registerBoth(debuggerDriver, threadId, frameIndex, "QScopedPointer", true);
         registerBoth(debuggerDriver, threadId, frameIndex, "QSharedPointer", true);
+        registerBoth(debuggerDriver, threadId, frameIndex, "QSharedDataPointer", true);
         registerBoth(debuggerDriver, threadId, frameIndex, "QString", false);
         registerBoth(debuggerDriver, threadId, frameIndex, "QTemporaryFile", false);
         registerBoth(debuggerDriver, threadId, frameIndex, "QTemporaryDir", false);
@@ -65,7 +67,7 @@ class LLDBRegistrar {
 
     private static void registerSummary(DebuggerDriver driver, long threadId, int frameIndex, String qtType, boolean generic)
             throws DebuggerCommandException, ExecutionException {
-        String command = "type summary add -F lookup.summary_lookup  -e -h";
+        String command = "type summary add -F qt6renderer.qt6_lookup_summary  -e -h";
         if (generic)
             command += " -x";
         command += " \"" + qtType + "\"";
@@ -75,7 +77,7 @@ class LLDBRegistrar {
 
     private static void registerSynth(DebuggerDriver driver, long threadId, int frameIndex, String qtType, boolean generic)
             throws DebuggerCommandException, ExecutionException {
-        String command = "type synthetic add -l lookup.synthetic_lookup";
+        String command = "type synthetic add -l qt6renderer.qt6_lookup_synthetic";
         if (generic)
             command += " -x";
         command += " \"" + qtType + "\"";
