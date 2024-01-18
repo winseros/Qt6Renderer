@@ -14,11 +14,16 @@ The plugin for pretty printing [Qt][qt] types by [CLion][clion] debugger.
 
 ## Debuggers support
 * LLDB
+* GDB
 
-## Operating systems support
+## Operating systems tested on
 * Windows
+  * Bundled LLDB 9
+  * Bundled GDB 13 
 * Linux
+  * Bundled LLDB 13
+  * Bundled GDB 13
 
-## Architectures support
+## Architectures tested on
 * x64
 
