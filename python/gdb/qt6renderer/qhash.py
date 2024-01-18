@@ -32,11 +32,15 @@ class QHashPrinter(StringAndStructurePrinter):
     def children(self) -> Iterable[Tuple[str, Value]]:
         d = self._valobj['d']
         if not d:
-            raise StopIteration
+            return
 
         d = d.dereference()
 
         num_buckets = int(d['numBuckets'])
+        if num_buckets > self._max_num_buckets():
+            # half-initialized structure
+            return
+
         nspans = int((num_buckets + 127) / 128)
         p_span = d['spans']
 
@@ -60,6 +64,11 @@ class QHashPrinter(StringAndStructurePrinter):
     def display_hint(self):
         return 'map'
 
+    def _max_num_buckets(self) -> int:
+        # return size_t(1) << (8 * sizeof(size_t) - 1);
+        size_t = lookup_type('size_t')
+        return 1 << (8 * size_t.sizeof - 1)
+
 
 class QHashIteratorPrinter(StructureOnlyPrinter):
     PROP_END = 'end'
@@ -69,7 +78,7 @@ class QHashIteratorPrinter(StructureOnlyPrinter):
         d = i['d']
         if not d:
             yield QHashIteratorPrinter.PROP_END, True
-            raise StopIteration
+            return
 
         parent_type = QHashIteratorPrinter._get_parent_type(self._valobj.type)
         p_type_key, p_type_value, v_alignment = _get_key_value_types(parent_type)
