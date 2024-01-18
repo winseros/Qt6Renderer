@@ -58,12 +58,12 @@ void DemoQHash()
     h5.insert('c', 'd');
     h5.insert('e', 'f');
 
-    /*auto it1 = h1.begin();
+    auto it1 = h1.begin();
     auto it1_end = h1.end();
     while (it1 != h1.end())
         ++it1;
     auto it2 = h1.keyBegin();
     auto it3 = h1.keyValueBegin();
     auto it4 = h1.constBegin();
-    auto it5 = h1.constKeyValueBegin();*/
+    auto it5 = h1.constKeyValueBegin();
 }
