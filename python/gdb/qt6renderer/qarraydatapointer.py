@@ -9,13 +9,22 @@ class QArrayDataPointerPrinter(StringAndStructurePrinter):
     def children(self):
         d = self._valobj['d']
         d_size = d['size']
-        d_ptr = d['ptr']
-        d_d_alloc = d['d']['alloc']
 
         yield QArrayDataPointerPrinter.PROP_SIZE, d_size
+
+        if d_size <= 0:
+            return
+
+        d_d_alloc = d['d']['alloc']
+
+        if d_d_alloc == 0 or d_size > d_d_alloc:
+            # half-initialized structure
+            return
+
         yield QArrayDataPointerPrinter.PROP_CAPACITY, d_d_alloc
         yield QArrayDataPointerPrinter.PROP_RAW_DATA, d
 
+        d_ptr = d['ptr']
         for i in range(d_size):
             chr_ptr = d_ptr + i
             yield f'[{i}]', chr_ptr.dereference()
