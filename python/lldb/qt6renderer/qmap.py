@@ -12,5 +12,10 @@ class QMapSynth(AbstractSynth):
             .GetChildMemberWithName('d')
 
         if d_d.GetValueAsUnsigned():
-            self._values = [d_d.GetChildMemberWithName('m')]
+            map = d_d.GetChildMemberWithName('m')
+            map_deref_type = map.type.GetTypedefedType()
+            if map_deref_type.IsValid():
+                self._values = [map.CreateValueFromData(map.name, map.data, map_deref_type)]
+            else:
+                self._values = [map]
         return False
