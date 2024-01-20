@@ -24,6 +24,10 @@ intellij {
 
 patchPluginXml {
     changeNotes = """
+      * 1.1.0
+      - GDB support
+      - LLDB code rewritten
+      
       * 1.0.0
       Initial version"""
     sinceBuild = "213.6461"
