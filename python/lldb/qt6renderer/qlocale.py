@@ -1,6 +1,7 @@
-from lldb import SBValue, eBasicTypeUnsignedLongLong, eBasicTypeUnsignedInt
+from lldb import SBValue, SBType, eBasicTypeUnsignedLongLong, eBasicTypeUnsignedInt, eBasicTypeUnsignedShort
 from .abstractsynth import AbstractSynth
 from .syntheticstruct import SyntheticStruct
+from .qshareddatapointer import QSharedDataPointer
 
 
 class QLocaleSynth(AbstractSynth):
@@ -17,10 +18,13 @@ class QLocaleSynth(AbstractSynth):
         return -1
 
     def update(self):
-        d = self._valobj.GetChildMemberWithName('d').GetChildMemberWithName('d')
-        priv = QLocalePrivate(d, self._valobj)
+        locale = QLocale(self._valobj)
+        priv = locale.d().d()
+        priv_data = priv.data()
 
-        self._values = [priv.data().territory(), priv.data().language(), priv.data().script(), priv.num_opts(), d]
+        d = self._valobj.GetChildMemberWithName('d').GetChildMemberWithName('d')
+
+        self._values = [priv_data.territory(), priv_data.language(), priv_data.script(), priv.num_opts(), d]
 
         return True
 
@@ -38,6 +42,13 @@ class QLocaleData(SyntheticStruct):
         type_territory = context.target.FindFirstType(context.type.name + '::Territory')
         if not type_territory.IsValid():
             type_territory = context.target.FindFirstType(context.type.name + '::Country')
+
+        if not type_lang.IsValid():
+            type_lang = context.target.GetBasicType(eBasicTypeUnsignedShort)
+        if not type_script.IsValid():
+            type_script = context.target.GetBasicType(eBasicTypeUnsignedShort)
+        if not type_territory.IsValid():
+            type_territory = context.target.GetBasicType(eBasicTypeUnsignedShort)
 
         self.add_sb_type_field(QLocaleData.PROP_LANG, type_lang)
         self.add_sb_type_field(QLocaleData.PROP_SCRIPT, type_script)
@@ -58,25 +69,29 @@ class QLocalePrivate(SyntheticStruct):
 
     def __init__(self, pointer: SBValue, context: SBValue):
         super().__init__(pointer)
-        self._context = context
 
-        self.add_sb_type_field('p_data', pointer.target.FindFirstType('void').GetPointerType())
+        self.add_synthetic_field('data', lambda p: QLocaleData(p, context), pointer=True)
         self.add_named_type_field('ref', 'QBasicAtomicInt')
         self.add_basic_type_field('index', eBasicTypeUnsignedInt)
 
-        type_num_opts = context.target.FindFirstType(context.type.name + '::NumberOptions')
+        type_num_opts = pointer.target.FindFirstType(context.type.name + '::NumberOptions')
         if not type_num_opts.IsValid():
-            type_num_opts = context.target.FindFirstType(f'QFlags<enum {context.type.name}::NumberOption>')
+            type_num_opts = pointer.target.FindFirstType(f'QFlags<enum {context.type.name}::NumberOption>')
 
         self.add_sb_type_field(QLocalePrivate.PROP_NUM_OPTS, type_num_opts)
 
-    def p_data(self) -> SBValue:
+    def data(self) -> QLocaleData:
         pass
 
-    def data(self) -> QLocaleData:
-        d = QLocaleData(self.p_data(), self._context)
-        self.data = lambda: d
-        return d
-
     def num_opts(self) -> SBValue:
+        pass
+
+
+class QLocale(SyntheticStruct):
+    def __init__(self, pointer: SBValue):
+        super().__init__(pointer)
+
+        self.add_synthetic_field('d', lambda p: QSharedDataPointer(p, lambda q: QLocalePrivate(q, pointer)))
+
+    def d(self) -> QSharedDataPointer[QLocalePrivate]:
         pass
