@@ -20,7 +20,7 @@ def has_cpp_generic_type(valobj: Value, cpp_name: str, suffix: str = '') -> bool
 
 def _get_type_tag(valobj: Value) -> str:
     type = valobj.type
-    tag = type.tag if type.tag else type.strip_typedefs().tag
+    tag = type.tag if type.tag else type.unqualified().strip_typedefs().tag
     return tag
 
 

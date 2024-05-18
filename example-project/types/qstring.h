@@ -12,4 +12,6 @@ void DemoQString() {
 
     const QSharedPointer<QString> qspStr(new QString("Shared pointer string"));
     const QString *pStr = qspStr.data();
+
+    const QString& qStrRef = str1;
 }

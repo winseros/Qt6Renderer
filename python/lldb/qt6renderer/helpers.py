@@ -18,5 +18,8 @@ def has_cpp_generic_type(valobj: SBValue, cpp_name: str, suffix: str = '') -> bo
 
 
 def _get_type_name(valobj: SBValue) -> str:
-    val_type = valobj.type.GetUnqualifiedType().GetCanonicalType()
+    val_type = valobj.type
+    if val_type.IsReferenceType:
+        val_type = val_type.GetDereferencedType()
+    val_type = val_type.GetUnqualifiedType().GetCanonicalType()
     return val_type.name if val_type.IsValid() else None
