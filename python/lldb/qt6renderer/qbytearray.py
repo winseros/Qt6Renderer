@@ -17,7 +17,7 @@ def qbytearray_string_summary(valobj: SBValue):
         return '""'
 
     size = sb_size.GetValueAsSigned()
-    if not size:
+    if size <= 0:
         return '""'
 
     sb_raw = valobj.GetChildMemberWithName(QArrayDataPointerSynth.PROP_RAW_DATA)

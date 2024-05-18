@@ -8,14 +8,19 @@ def qstring_summary_no_quotes(valobj: SBValue) -> str:
         return ''
 
     size = sb_size.GetValueAsSigned()
-    if not size:
+    if size <= 0:
         return ''
 
     sb_raw = valobj.GetChildMemberWithName(QArrayDataPointerSynth.PROP_RAW_DATA)
     if not sb_raw:
         return ''
 
-    data = sb_raw.GetPointeeData(0, size).sint16s
+    # QString is char16_t in the C++ code.
+    # But Python goes wild when string bytes have higher order values, like 65533,
+    # because sint16 of such values get interpreted as negative numbers and Python
+    # is unable to convert them to chars.
+
+    data = sb_raw.GetPointeeData(0, size).uint16s
 
     result = ''
     for code in data:

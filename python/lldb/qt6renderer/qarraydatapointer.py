@@ -54,6 +54,9 @@ class QArrayDataPointerSynth(LazySynth):
         self._values[self._num_data_fields] = size
         self._bump_field_counter()
 
+        if size.GetValueAsSigned() <= 0:
+            return False
+
         d_d = d.GetChildMemberWithName('d')
 
         if d_d.GetValueAsUnsigned():
