@@ -24,6 +24,9 @@ intellij {
 
 patchPluginXml {
     changeNotes = """
+      * 1.1.1
+      - Minor render bug fixes
+
       * 1.1.0
       - GDB support
       - LLDB code rewritten
