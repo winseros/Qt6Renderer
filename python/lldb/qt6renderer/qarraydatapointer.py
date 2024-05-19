@@ -1,4 +1,4 @@
-from lldb import SBValue, SBData, eBasicTypeUnsignedLongLong
+from lldb import SBValue, SBData, eBasicTypeInt
 from .lazysynth import LazySynth
 
 
@@ -62,8 +62,8 @@ class QArrayDataPointerSynth(LazySynth):
         if d_d.GetValueAsUnsigned():
             alloc = d_d.GetChildMemberWithName('alloc')
             self._values[self._num_data_fields] = self._valobj.CreateValueFromData(
-                QArrayDataPointerSynth.PROP_CAPACITY, alloc.GetData(),
-                alloc.GetType())
+                QArrayDataPointerSynth.PROP_CAPACITY, alloc.GetData() if alloc else SBData.CreateDataFromInt(0),
+                alloc.GetType() if alloc else self._valobj.target.GetBasicType(eBasicTypeInt))
             self._bump_field_counter()
 
             d_ptr = d.GetChildMemberWithName('ptr')
