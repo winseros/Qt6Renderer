@@ -1,20 +1,19 @@
 # QT6 Renderer
 
-The plugin for pretty printing [Qt][qt] types by [CLion][clion] debugger.
+The set of scripts for pretty printing [Qt][qt] by [GDB][gdb] and [LLDB][lldb].
 
-[qt]: https://www.qt.io/
-[clion]: https://www.jetbrains.com/clion/
+## IDE plugins
+* [CLion][qt6renderer_intlj]
+* [Visual Studio Code][qt6renderer_vsc]
 
 ## Qt versions support
 * 6.x
 
-See the note about some problems with 6.4.2 and below.
-
 ## Qt types support
-* [See here for lldb](./python/lldb)
-* [See here for gdb](./python/gdb)
+* [See here for GDB](./python/gdb)
+* [See here for LLDB](./python/lldb)
 
-You can use the [example project](./example-project) for testsing.
+You can use the [example project][qt6renderer_exmpl] for testsing.
 
 ## Debuggers support
 * LLDB
@@ -33,10 +32,9 @@ You can use the [example project](./example-project) for testsing.
 
 ## Requirements
 
-This plugin needs Debug information for Qt.
+The scripts need `Qt Debug Information Files` to work.
 
-If you installed Qt with Qt Online installer, ensure you have installed
-the `Qt Debug Information files`:
+If you installed Qt with Qt Online installer, ensure you have installed the appropriate item:
 
 ![Checkbox for QtDebug Information files](images/Qt_Debug_Information_files_checkbox.png)
 
@@ -46,13 +44,29 @@ You can install manually (by specifying the url), or by enabling global repo. Se
 sudo pacman -U https://geo.mirror.pkgbuild.com/extra-debug/os/x86_64/qt6-base-debug-6.7.2-1-x86_64.pkg.tar.zst
 ```
 
+## Manual installation
+
+### GDB
+
+1. Copy the [qt6renderer](./python/gdb/qt6renderer/) folder somewhere at your system.
+2. Place the [gdbinit](https://man7.org/linux/man-pages/man5/gdbinit.5.html) in the any of the supported places at your system.
+3. Add the following content to the `gdbinit`:
+   ```python
+   python sys.path.append('/where/the/qt6renderer/folder/is/at/your/system') 
+   # i.e. if the qt6renderer is at '~/gdb/scripts/qt6renderer'
+   # then you add '~/gdb/scripts'
+   python import qt6renderer
+   python gdb.pretty_printers.append(qt6renderer.qt6_lookup)
+   set print pretty on
+   ```
+
 ## Troubleshooting
 
 ### Qt Types are not pretty printed
 
 First, ensure you have satisfied [requirements](#Requirements).
 
-Open the example project in CLion. Set a breakpoint somewhere in the `main()` function, and start a debugging session (Shift + F9 by default).
+Open the example project in IDE. Set a breakpoint somewhere in the `main()` function, and start a debugging session.
 
 Now click on the debugger console tab (this will be "GDB" or "LLDB" depending on toolchain you use), and enter the command
 for a quick check if a specific version includes type metainfo.
@@ -84,3 +98,11 @@ For gdb, that looks like `{3, 7, 394754, 0, 0, 0, 22}`:
 For lldb, that looks like `02 07 06 00 00 00 00 00`:
 
 ![Have debug info lldb](images/debug_info_lldb_good.png)
+
+
+[qt]: https://www.qt.io/
+[gdb]: https://sourceware.org/gdb/
+[lldb]: https://lldb.llvm.org/
+[qt6renderer_exmpl]: https://github.com/winseros/Qt6RendererExmpl
+[qt6renderer_intlj]: https://github.com/winseros/Qt6RendererIntlj
+[qt6renderer_vsc]: https://github.com/winseros/Qt6RendererVscj
