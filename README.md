@@ -21,28 +21,10 @@ You can use the [example project][qt6renderer_exmpl] for testsing.
 
 ## Operating systems tested on
 * Windows
-  * Bundled LLDB 9
-  * Bundled GDB 13 
-* Linux
-  * Bundled LLDB 13
-  * Bundled GDB 13
+* Linux  
 
 ## Architectures tested on
 * x64
-
-## Requirements
-
-The scripts need `Qt Debug Information Files` to work.
-
-If you installed Qt with Qt Online installer, ensure you have installed the appropriate item:
-
-![Checkbox for QtDebug Information files](images/Qt_Debug_Information_files_checkbox.png)
-
-If you are using Arch Linux, you need to install `qt6-base-debug` package.
-You can install manually (by specifying the url), or by enabling global repo. See [wiki](https://wiki.archlinux.org/title/Debugging/Getting_traces#Installing_debug_packages).
-```
-sudo pacman -U https://geo.mirror.pkgbuild.com/extra-debug/os/x86_64/qt6-base-debug-6.7.2-1-x86_64.pkg.tar.zst
-```
 
 ## Manual installation
 
@@ -60,44 +42,121 @@ sudo pacman -U https://geo.mirror.pkgbuild.com/extra-debug/os/x86_64/qt6-base-de
    set print pretty on
    ```
 
+## Requirements
+Pretty printers need Debug information for `Qt`.
+
+If you installed `Qt` with `Qt Online Installer`, ensure you have installed
+the `Qt Debug Information Files`:
+
+![Checkbox for QtDebug Information Files](images/qt_debug_information_files_checkbox.png)
+
+<details>
+<summary>If you are using Arch Linux</summary>
+
+Then you might wish to install `qt6-base-debug` package.
+You can install manually (by specifying the url), or by enabling global repo. See [wiki](https://wiki.archlinux.org/title/Debugging/Getting_traces#Installing_debug_packages).
+
+```
+pacman -U https://geo.mirror.pkgbuild.com/extra-debug/os/x86_64/qt6-base-debug-6.7.2-1-x86_64.pkg.tar.zst
+```
+</details>
+
 ## Troubleshooting
 
 ### Qt Types are not pretty printed
 
-First, ensure you have satisfied [requirements](#Requirements).
+1. Ensure you have satisfied [requirements](#requirements).
+2. Ensure the proper `Qt` files loaded at runtime.
 
-Open the example project in IDE. Set a breakpoint somewhere in the `main()` function, and start a debugging session.
+   > :large_blue_diamond: On Linux one might have `Qt` installed on the host system as a runtime libraries, for instance if the host system runs KDE. The debug target might load the `Qt` libraries from the host system, instead of the `Qt` development SDK.
 
-Now click on the debugger console tab (this will be "GDB" or "LLDB" depending on toolchain you use), and enter the command
-for a quick check if a specific version includes type metainfo.
+   Run the command to check:
 
-For the gdb console, use command:
-```
-python print(gdb.parse_and_eval('*(&qtHookData)'))
-```
+   <details>
+    <summary>GDB</summary>
 
-For lldb console, use command:
-```
-script print(lldb.target.FindFirstGlobalVariable('qtHookData').GetPointeeData(2, 1))
-```
+    ```
+    info sharedLibrary
+    ```
 
-There are problematic Qt versions, for which the debugger is unable to extract type metadata.
+    Should print something like:
+    
+    ```
+    0x00007ffff7e63940  0x00007ffff7f58b1a Yes /home/user/Qt/6.6.1/gcc_64/lib/libQt6Network.so.6
+    0x00007ffff751f300  0x00007ffff7c0abe2 Yes /home/user/Qt/6.6.1/gcc_64/lib/libQt6Gui.so.6
+    0x00007ffff6cb75e0  0x00007ffff70848eb Yes /home/user/Qt/6.6.1/gcc_64/lib/libQt6Core.so.6
+    ```
+   </details>
 
-For example, for Qt 6.4.2 in gdb console you will get `<data variable, no debug info>` message:
+   <details>
+    <summary>LLDB</summary>
+        
+    ```
+    target modules list
+    ````
 
-![No debug info gdb](images/debug_info_gdb_bad.png)
+    Should print something like:
 
-Consider switching to another version of Qt.
+    ```
+    [  3] 0B3D90D4-3A24-26F8-2D28-E6FD902D2E1C-B1957B9C 0x00007ffff7e16000 /home/user/Qt/6.6.1/gcc_64/lib/libQt6Network.so.6 
+      /home/user/Qt/6.6.1/gcc_64/lib/Qt6Network.debug
+    [  4] 8D17CAB4-3968-A65B-FA7A-452CBB959B12-FE3D941E 0x00007ffff7400000 /home/user/Qt/6.6.1/gcc_64/lib/libQt6Gui.so.6 
+      /home/user/Qt/6.6.1/gcc_64/lib/Qt6Gui.debug
+    [  5] 70B3E481-9AFD-557A-D568-DB9065A3D74A-503165F0 0x00007ffff6c00000 /home/user/Qt/6.6.1/gcc_64/lib/libQt6Core.so.6 
+      /home/user/Qt/6.6.1/gcc_64/lib/Qt6Core.debug
+    ```
+   </details>   
+  
+3. Ensure the `Qt` version supports pretty printing.   
 
-For the supported Qt version, you will get some debug info.
+   > :large_blue_diamond: There are problematic `Qt` versions, e.g. `6.4.2`, for which the debugger is unable to extract type metadata. Consider switching to another version of `Qt`.
 
-For gdb, that looks like `{3, 7, 394754, 0, 0, 0, 22}`:
+   To check whether the `Qt` version has metadata, run:
 
-![Have debug info gdb](images/debug_info_gdb_good.png)
+   <details>
+    <summary>GDB</summary>
 
-For lldb, that looks like `02 07 06 00 00 00 00 00`:
+    ```
+    python print(gdb.parse_and_eval('*(&qtHookData)'))
+    ```
 
-![Have debug info lldb](images/debug_info_lldb_good.png)
+    If degugger could read the metadata, it will print something like:
+    
+    ```
+    {3, 7, 394754, 0, 0, 0, 22}
+    ```
+
+    ![GDB could extract Qt Metadata - Visual Studio Code](images/gdb_qt_meta_available_vsc.png)
+
+    ![GDB could extract Qt Metadata - CLion](images/gdb_qt_meta_available_jb.png)
+
+    Otherwise:
+
+    ```
+    <data variable, no debug info>
+    ```
+
+    ![GDB could not extract Qt Metadata - CLion](images/gdb_qt_meta_unavailable_jb.png)
+   </details>
+
+   <details>
+     <summary>LLDB</summary>
+
+     ```
+     script print(lldb.target.FindFirstGlobalVariable('qtHookData').GetPointeeData(2, 1))
+     ```
+
+     If degugger could read the metadata, it will print something like:
+    
+     ```
+     02 07 06 00 00 00 00 00
+     ```
+
+     ![LLDB could extract Qt Metadata - Visual Studio Code](images/lldb_qt_meta_available_vsc.png)
+
+     ![LLDB could extract Qt Metadata - CLion](images/lldb_qt_meta_available_jb.png)
+   </details>
+
 
 
 [qt]: https://www.qt.io/
@@ -105,4 +164,4 @@ For lldb, that looks like `02 07 06 00 00 00 00 00`:
 [lldb]: https://lldb.llvm.org/
 [qt6renderer_exmpl]: https://github.com/winseros/Qt6RendererExmpl
 [qt6renderer_intlj]: https://github.com/winseros/Qt6RendererIntlj
-[qt6renderer_vsc]: https://github.com/winseros/Qt6RendererVscj
+[qt6renderer_vsc]: https://github.com/winseros/Qt6RendererVsc
