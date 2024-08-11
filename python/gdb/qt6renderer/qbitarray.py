@@ -14,6 +14,10 @@ class QBitArrayPrinter(StringAndStructurePrinter):
         d_d = self._valobj['d']['d']
         d_d_size = d_d['size']
         if d_d_size:
+            if d_d_size > 1_000_000:
+                #highly likely a half-initialized struct
+                d_d_size = 1_000_000
+
             d_d_ptr = d_d['ptr']
 
             d_d_bytes = []
