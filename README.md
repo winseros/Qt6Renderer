@@ -76,7 +76,7 @@ pacman -U https://geo.mirror.pkgbuild.com/extra-debug/os/x86_64/qt6-base-debug-6
     <summary>GDB</summary>
 
     ```
-    info sharedLibrary
+    info sharedlibrary
     ```
 
     Should print something like:
