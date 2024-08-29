@@ -72,6 +72,29 @@ pacman -U https://geo.mirror.pkgbuild.com/extra-debug/os/x86_64/qt6-base-debug-6
 
 1. Ensure you have satisfied [requirements](#requirements).
 2. GDB only. Ensure there is nothing in your [gdbinit][gdbinit], what might disrupt pretty printing. Disable your `gdbinit`.
+
+   <details>
+     <summary>Run the command to check</summary>
+
+     ```
+     info pretty-printer
+     ```
+
+     > :large_blue_diamond: In the case of `Visual Studio Code` [you need][vscode_exec] to call the gdb commands with the `-exec` prefix. I.e. `-exec info pretty-printer`.
+
+     Should print something like:
+
+     ```
+     global pretty-printers:
+       builtin
+         mpx_bound128
+       qt6_lookup
+     objfile /usr/lib/libstdc++.so.6 pretty-printers:
+       libstdc++-v6
+     ```     
+
+  </details>
+  
 3. Ensure the proper `Qt` files loaded at runtime.
 
    > :large_blue_diamond: On Linux one might have `Qt` installed on the host system as a runtime libraries, for instance if the host system runs KDE. The debug target might load the `Qt` libraries from the host system, instead of the `Qt` development SDK.
@@ -128,7 +151,7 @@ pacman -U https://geo.mirror.pkgbuild.com/extra-debug/os/x86_64/qt6-base-debug-6
     python print(gdb.parse_and_eval('*(&qtHookData)'))
     ```
 
-    > :large_blue_diamond: In the case of `Visual Studio Code` [you need][vscode_exec] to call the gdb commands with the `-exec` prefix. I.e. `-exec info sharedlibrary`.
+    > :large_blue_diamond: In the case of `Visual Studio Code` [you need][vscode_exec] to call the gdb commands with the `-exec` prefix. I.e. `-exec python print(...)`.
 
     If degugger could read the metadata, it will print something like:
     
