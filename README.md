@@ -28,6 +28,11 @@ You can use the [example project][qt6renderer_exmpl] for testsing.
 
 ## Manual installation
 
+> [!NOTE]
+> Manual installation is an option if you prefer to run GDB executable without an IDE. Or if there is no plugin for your IDE. Or in any other situation when you know what you're doing.
+>
+> You do not need to install manually, if you use an IDE plugin.
+
 ### GDB
 
 1. Copy the [qt6renderer](./python/gdb/qt6renderer/) folder somewhere at your system.
