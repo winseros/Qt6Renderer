@@ -85,6 +85,8 @@ pacman -U https://geo.mirror.pkgbuild.com/extra-debug/os/x86_64/qt6-base-debug-6
     info sharedlibrary
     ```
 
+    > :large_blue_diamond: In the case of `Visual Studio Code` [you need][vscode_exec] to call the gdb commands with the `-exec` prefix. I.e. `-exec info sharedlibrary`.
+
     Should print something like:
     
     ```
@@ -125,6 +127,8 @@ pacman -U https://geo.mirror.pkgbuild.com/extra-debug/os/x86_64/qt6-base-debug-6
     ```
     python print(gdb.parse_and_eval('*(&qtHookData)'))
     ```
+
+    > :large_blue_diamond: In the case of `Visual Studio Code` [you need][vscode_exec] to call the gdb commands with the `-exec` prefix. I.e. `-exec info sharedlibrary`.
 
     If degugger could read the metadata, it will print something like:
     
@@ -178,3 +182,4 @@ pacman -U https://geo.mirror.pkgbuild.com/extra-debug/os/x86_64/qt6-base-debug-6
 [qt6renderer_intlj]: https://github.com/winseros/Qt6RendererIntlj
 [qt6renderer_vsc]: https://github.com/winseros/Qt6RendererVsc
 [gdbinit]: https://man7.org/linux/man-pages/man5/gdbinit.5.html
+[vscode_exec]: https://github.com/Microsoft/vscode-cpptools/issues/106
