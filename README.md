@@ -36,7 +36,7 @@ You can use the [example project][qt6renderer_exmpl] for testsing.
 ### GDB
 
 1. Copy the [qt6renderer](./python/gdb/qt6renderer/) folder somewhere at your system.
-2. Place the [gdbinit](https://man7.org/linux/man-pages/man5/gdbinit.5.html) in the any of the supported places at your system.
+2. Place the [gdbinit][gdbinit] in the any of the supported places at your system.
 3. Add the following content to the `gdbinit`:
    ```python
    python sys.path.append('/where/the/qt6renderer/folder/is/at/your/system') 
@@ -71,7 +71,8 @@ pacman -U https://geo.mirror.pkgbuild.com/extra-debug/os/x86_64/qt6-base-debug-6
 ### Qt Types are not pretty printed
 
 1. Ensure you have satisfied [requirements](#requirements).
-2. Ensure the proper `Qt` files loaded at runtime.
+2. GDB only. Ensure there is nothing in your [gdbinit][gdbinit], what might disrupt pretty printing. Disable your `gdbinit`.
+3. Ensure the proper `Qt` files loaded at runtime.
 
    > :large_blue_diamond: On Linux one might have `Qt` installed on the host system as a runtime libraries, for instance if the host system runs KDE. The debug target might load the `Qt` libraries from the host system, instead of the `Qt` development SDK.
 
@@ -112,7 +113,7 @@ pacman -U https://geo.mirror.pkgbuild.com/extra-debug/os/x86_64/qt6-base-debug-6
     ```
    </details>   
   
-3. Ensure the `Qt` version supports pretty printing.   
+4. Ensure the `Qt` version supports pretty printing.   
 
    > :large_blue_diamond: There are problematic `Qt` versions, e.g. `6.4.2`, for which the debugger is unable to extract type metadata. Consider switching to another version of `Qt`.
 
@@ -129,6 +130,12 @@ pacman -U https://geo.mirror.pkgbuild.com/extra-debug/os/x86_64/qt6-base-debug-6
     
     ```
     {3, 7, 394754, 0, 0, 0, 22}
+    ```
+    
+    or
+    
+    ```
+    0x7ffff729bd00 <qtHookData>
     ```
 
     ![GDB could extract Qt Metadata - Visual Studio Code](images/gdb_qt_meta_available_vsc.png)
@@ -170,3 +177,4 @@ pacman -U https://geo.mirror.pkgbuild.com/extra-debug/os/x86_64/qt6-base-debug-6
 [qt6renderer_exmpl]: https://github.com/winseros/Qt6RendererExmpl
 [qt6renderer_intlj]: https://github.com/winseros/Qt6RendererIntlj
 [qt6renderer_vsc]: https://github.com/winseros/Qt6RendererVsc
+[gdbinit]: https://man7.org/linux/man-pages/man5/gdbinit.5.html
