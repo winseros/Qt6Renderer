@@ -22,9 +22,11 @@ You can use the [example project][qt6renderer_exmpl] for testsing.
 ## Operating systems tested on
 * Windows
 * Linux  
+* macOS  
 
 ## Architectures tested on
 * x64
+* arm64
 
 ## Manual installation
 
@@ -46,6 +48,15 @@ You can use the [example project][qt6renderer_exmpl] for testsing.
    python gdb.pretty_printers.append(qt6renderer.qt6_lookup)
    set print pretty on
    ```
+
+### LLDB
+
+1. Copy the [qt6renderer lldb](./python/lldb/) folder somewhere at your system
+2. If you don't already have one, create a .lldbinit file in an appropriate place for your OS (on macOS this will be ~/.lldbinit)
+3. Add the following line to your `.lldbinit` (replacing /full/path/to... with the actual full path to register.py):
+```
+command script import "/full/path/to/qt6renderer/lldb/register.py"
+```
 
 ## Requirements
 Pretty printers need Debug information for `Qt`.
