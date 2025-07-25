@@ -41,8 +41,6 @@ class QHashSynth(AbstractSynth):
         p_span = d.GetChildMemberWithName('spans')
 
         [t_key, t_value] = TypeHelpers.get_template_types(self._valobj.type, 2, self._valobj.target)
-        entry_size = KeyValuePair(self._valobj, t_key, t_value).get_sibling_aligned_size()
-
         sb_int = self._valobj.target.GetBasicType(eBasicTypeInt)
 
         for b in range(nspans):
@@ -50,7 +48,10 @@ class QHashSynth(AbstractSynth):
                                                        p_span.type).Dereference()
 
             offsets = span.GetChildMemberWithName('offsets').data.uint8s
-            entries_addr = span.GetChildMemberWithName('entries').GetValueAsUnsigned()
+            entries = span.GetChildMemberWithName('entries')
+            entries_addr = entries.GetValueAsUnsigned()
+            # Get the address of item 1 and subtract to find out the actual stride of the array
+            entry_size = entries.GetChildAtIndex(1, False, True).AddressOf().GetValueAsUnsigned() - entries_addr
 
             for i in range(128):
                 offset = offsets[i]
@@ -96,7 +97,6 @@ class QHashIteratorSynth(AbstractSynth):
 
         [t_key, t_value] = TypeHelpers.get_template_types(self._valobj.type, 2, self._valobj.target)
 
-        entry_size = KeyValuePair(self._valobj, t_key, t_value).get_sibling_aligned_size()
         sb_int = self._valobj.target.GetBasicType(eBasicTypeInt)
 
         bucket = i.GetChildMemberWithName('bucket').GetValueAsUnsigned()
@@ -108,7 +108,10 @@ class QHashIteratorSynth(AbstractSynth):
 
         index_offset = bucket & 127
         offsets = span.GetChildMemberWithName('offsets').data.uint8s
-        entries_addr = span.GetChildMemberWithName('entries').GetValueAsUnsigned()
+        entries = span.GetChildMemberWithName('entries')
+        entries_addr = entries.GetValueAsUnsigned()
+        # Get the address of item 1 and subtract to find out the actual stride of the array
+        entry_size = entries.GetChildAtIndex(1, False, True).AddressOf().GetValueAsUnsigned() - entries_addr
 
         sb_pair = self._valobj.CreateValueFromAddress('pair', entries_addr + offsets[index_offset] * entry_size, sb_int)
         pair = KeyValuePair(sb_pair, t_key, t_value)
