@@ -73,7 +73,17 @@ Then you might wish to install `qt6-base-debug` package.
 You can install manually (by specifying the url), or by enabling global repo. See [wiki](https://wiki.archlinux.org/title/Debugging/Getting_traces#Installing_debug_packages).
 
 ```
-pacman -U https://geo.mirror.pkgbuild.com/extra-debug/os/x86_64/qt6-base-debug-6.7.2-1-x86_64.pkg.tar.zst
+qtpkgver=$(pacman -Q qt6-base | cut -f2 -d ' ')
+sudo pacman -U https://geo.mirror.pkgbuild.com/extra-debug/os/x86_64/qt6-base-debug-${qtpkgver}-x86_64.pkg.tar.zst
+```
+
+When upgrading the qt6-base, ensure you also upgrade the qt6-base-debug. Their versions should be the same,
+otherwise pretty printing will not work:
+
+```
+❯ pacman -Q qt6-base qt6-base-debug
+qt6-base 6.7.2-2
+qt6-base-debug 6.7.2-2
 ```
 </details>
 
