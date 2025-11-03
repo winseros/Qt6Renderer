@@ -4,6 +4,7 @@ from .helpers import has_cpp_type, has_cpp_generic_type
 from .qatomicint import qatomicint_summary
 from .qbitarray import qbitarray_summary, QBitArraySynth
 from .qbytearray import qbytearray_summary, QByteArraySynth
+from .qcborvalue import QCborValueSynth
 from .qchar import qchar_summary
 from .qdate import qdate_summary, QDateSynth
 from .qdatetime import qdatetime_summary, QDateTimeSynth
@@ -13,6 +14,8 @@ from .qfile import qfile_summary, QFileSynth, QTemporaryFileSynth
 from .qfileinfo import qfileinfo_summary, QFileInfoSynth
 from .qflags import qflags_summary
 from .qhash import qhash_summary, QHashSynth, QHashIteratorSynth
+from .qjsonobject import QJsonObjectSynth
+from .qjsonvalue import QJsonValueSynth
 from .qhostaddress import qhostaddress_summary
 from .qlist import qlist_summary, QListSynth
 from .qlocale import QLocaleSynth
@@ -94,6 +97,8 @@ def qt6_lookup_synthetic(valobj: SBValue, internal_dict):
         return QBitArraySynth(valobj)
     elif has_cpp_type(valobj, 'QByteArray'):
         return QByteArraySynth(valobj)
+    elif has_cpp_type(valobj, 'QCborValue'):
+        return QCborValueSynth(valobj)
     elif has_cpp_type(valobj, 'QDate'):
         return QDateSynth(valobj)
     elif has_cpp_type(valobj, 'QDateTime'):
@@ -111,6 +116,10 @@ def qt6_lookup_synthetic(valobj: SBValue, internal_dict):
     elif (has_cpp_generic_type(valobj, 'QHash', '::iterator')
           or has_cpp_generic_type(valobj, 'QHash', '::const_iterator')):
         return QHashIteratorSynth(valobj)
+    elif has_cpp_type(valobj, 'QJsonObject'):
+        return QJsonObjectSynth(valobj)
+    elif has_cpp_type(valobj, 'QJsonValue'):
+        return QJsonValueSynth(valobj)
     elif has_cpp_generic_type(valobj, 'QList'):
         return QListSynth(valobj)
     elif has_cpp_type(valobj, 'QLocale'):

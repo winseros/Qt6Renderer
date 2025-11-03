@@ -70,7 +70,7 @@ class QLocalePrivate(SyntheticStruct):
     def __init__(self, pointer: SBValue, context: SBValue):
         super().__init__(pointer)
 
-        self.add_synthetic_field('data', lambda p: QLocaleData(p, context), pointer=True)
+        self.add_synthetic_field_pointer('data', lambda p: QLocaleData(p, context))
         self.add_named_type_field('ref', 'QBasicAtomicInt')
         self.add_basic_type_field('index', eBasicTypeUnsignedInt)
 

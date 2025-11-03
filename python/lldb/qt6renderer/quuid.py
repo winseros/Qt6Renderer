@@ -1,4 +1,4 @@
-from lldb import SBValue, SBError
+from lldb import SBValue
 
 
 def quuid_summary(valobj: SBValue):
