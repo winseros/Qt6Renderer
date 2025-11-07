@@ -1,11 +1,12 @@
 from lldb import SBValue
 from abc import abstractmethod
-from typing import Union
+from typing import Union, List
+
 
 class AbstractSynth:
     def __init__(self, valobj: SBValue):
         self._valobj = valobj
-        self._values = []
+        self._values: List[SBValue] = []
 
     def has_children(self) -> bool:
         return True

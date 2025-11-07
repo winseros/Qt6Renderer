@@ -1,4 +1,3 @@
-import importlib
 from typing import Union
 from lldb import (eBasicTypeLongLong,
                   eBasicTypeUnsignedLongLong,
@@ -34,11 +33,15 @@ class QCborContainerPrivate(QSharedData):
     def elements(self) -> QArrayDataPointerContainer['QCborElement']:
         pass
 
-    def byte_data(self, e: 'QCborElement') -> Union['ByteData', 'None']:
-        if not e.flags().GetValueAsSigned() & QCborElement.VALUE_FLAG_HasByteData:
+    def byte_data_at(self, index: int) -> Union['ByteData', 'None']:
+        element = self.elements().d().element_at(index)
+        if not element:
             return None
 
-        offset = e.value().GetValueAsSigned()
+        if not element.flags().GetValueAsSigned() & QCborElement.VALUE_FLAG_HasByteData:
+            return None
+
+        offset = element.value().GetValueAsSigned()
         ref_t = self._pointer.target.GetBasicType(eBasicTypeInt)
         field_name = f'{self._pointer.name}.b_ref'
         b_start = self.data().d().get_ptr().CreateChildAtOffset(field_name, offset, ref_t)
@@ -50,7 +53,7 @@ class QCborContainerPrivate(QSharedData):
         if element_flags & QCborElement.VALUE_FLAG_IsContainer:
             t = self._pointer.target
             d = SBData.CreateDataFromSInt64Array(t.GetByteOrder(), t.GetAddressByteSize(), [-1])
-            n = SBValue.CreateValueFromData('n', d, t.GetBasicType(eBasicTypeLongLong))
+            n = self._pointer.CreateValueFromData('n', d, t.GetBasicType(eBasicTypeLongLong))
             return qcborvalue.QCborValue.from_data(element.type(), n, element.container())
         elif element_flags & QCborElement.VALUE_FLAG_HasByteData:
             t = self._pointer.target
@@ -59,22 +62,18 @@ class QCborContainerPrivate(QSharedData):
             return qcborvalue.QCborValue.from_data(element.type(), n, self)
         return qcborvalue.QCborValue.from_data(element.type(), element.value())
 
-    def string_data(self, e: 'QCborElement') -> Union['SBValue', 'None']:
-        data = self.byte_data(e)
+    def string_data_at(self, index: int) -> Union['SBValue', 'None']:
+        data = self.byte_data_at(index)
         if not data:
             return None
 
         value = data.data()
-        if e.flags().GetValueAsSigned() & QCborElement.VALUE_FLAG_StringIsUtf16:
+        elements = self.elements().d().element_at(index)
+        if elements.flags().GetValueAsSigned() & QCborElement.VALUE_FLAG_StringIsUtf16:
             data_t = self._pointer.target.GetBasicType(eBasicTypeChar16)
             value = value.CreateValueFromData(value.name, value.data, data_t)
 
         return value
-
-    def string_data_at(self, index: int) -> Union['SBValue', None]:
-        element = self.elements().d().element_at(index)
-        data = self.string_data(element)
-        return data
 
 
 class QCborElement(SyntheticStruct):
@@ -90,6 +89,9 @@ class QCborElement(SyntheticStruct):
         self.add_synthetic_field_pointer('container', lambda p: QCborContainerPrivate(p))
         self.add_named_type_field('type', 'QCborValue::Type')
         self.add_basic_type_field('flags', eBasicTypeInt)
+
+    def pointer(self):
+        return self._pointer
 
     def value(self) -> SBValue:
         pass

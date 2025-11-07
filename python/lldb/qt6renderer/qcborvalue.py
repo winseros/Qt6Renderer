@@ -1,7 +1,5 @@
-import importlib
 from typing import Union
 from lldb import (eBasicTypeLongLong,
-                  eBasicTypeDouble,
                   SBValue)
 
 from .abstractsynth import AbstractSynth
@@ -83,26 +81,20 @@ class QCborValue(SyntheticStruct):
         if data_type in [QCborValue.TYPE_Integer, QCborValue.TYPE_Double]:
             return self.n()
         elif data_type == QCborValue.TYPE_ByteArray:
-            element = self.container().elements().d().element_at(self.n().GetValueAsSigned())
-            if element:
-                byte_data = self.container().byte_data(element)
+            byte_data = self.container().byte_data_at(self.n().GetValueAsSigned())
+            if byte_data:
                 return byte_data.data()
         elif data_type == QCborValue.TYPE_String:
-            element = self.container().elements().d().element_at(self.n().GetValueAsSigned())
-            if element:
-                str_data = self.container().string_data(element)
-                if str_data:
-                    return str_data
+            string_data = self.container().string_data_at(self.n().GetValueAsSigned())
+            if string_data:
+                return string_data
         elif data_type in [QCborValue.TYPE_DateTime, QCborValue.TYPE_Url, QCborValue.TYPE_RegularExpression]:
-            element = self.container().elements().d().element_at(1)
-            if element:
-                str_data = self.container().string_data(element)
-                if str_data:
-                    return str_data
+            string_data = self.container().string_data_at(1)
+            if string_data:
+                return string_data
         elif data_type == QCborValue.TYPE_Uuid:
-            element = self.container().elements().d().element_at(1)
-            if element:
-                byte_data = self.container().byte_data(element)
+            byte_data = self.container().byte_data_at(1)
+            if byte_data:
                 return byte_data.data()
 
         return None
