@@ -24,7 +24,7 @@ from .qscopedpointer import qscopedpointer_summary, QScopedPointerSynth
 from .qshareddatapointer import qshareddatapointer_summary, QSharedDataPointerSynth
 from .qsharedpointer import qsharedpointer_summary, QSharedPointerSynth
 from .qstring import qstring_summary, QStringSynth
-from .qtcbor_element import QtCborElementSynth
+from .qtcbor_element import qtcborelement_summaru, QtCborElementSynth
 from .qtemporarydir import qtemporarydir_summary, QTemporaryDirSynth
 from .qtime import qtime_summary, QTimeSynth
 from .qtimezone import qtimezone_summary, QTimeZoneSynth
@@ -73,6 +73,8 @@ def qt6_lookup_summary(valobj: SBValue, internal_dict):
         return qsharedpointer_summary(valobj)
     elif has_cpp_type(valobj, 'QString'):
         return qstring_summary(valobj)
+    elif has_cpp_type(valobj, 'QtCbor::Element'):
+        return qtcborelement_summaru(valobj)
     elif has_cpp_type(valobj, 'QTemporaryDir'):
         return qtemporarydir_summary(valobj)
     elif has_cpp_type(valobj, 'QTime'):
