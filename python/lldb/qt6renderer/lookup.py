@@ -14,7 +14,8 @@ from .qfile import qfile_summary, QFileSynth, QTemporaryFileSynth
 from .qfileinfo import qfileinfo_summary, QFileInfoSynth
 from .qflags import qflags_summary
 from .qhash import qhash_summary, QHashSynth, QHashIteratorSynth
-from .qjsonobject import QJsonObjectSynth
+from .qjsonarray import qjsonarray_summary, QJsonArraySynth
+from .qjsonobject import qjsonobject_summary, QJsonObjectSynth
 from .qjsonvalue import QJsonValueSynth
 from .qhostaddress import qhostaddress_summary
 from .qlist import qlist_summary, QListSynth
@@ -59,6 +60,10 @@ def qt6_lookup_summary(valobj: SBValue, internal_dict):
         return qfileinfo_summary(valobj)
     elif has_cpp_generic_type(valobj, 'QFlags'):
         return qflags_summary(valobj)
+    elif has_cpp_type(valobj, 'QJsonArray'):
+        return qjsonarray_summary(valobj)
+    elif has_cpp_type(valobj, 'QJsonObject'):
+        return qjsonobject_summary(valobj)
     elif has_cpp_generic_type(valobj, 'QHash'):
         return qhash_summary(valobj)
     elif has_cpp_type(valobj, 'QHostAddress'):
@@ -119,6 +124,8 @@ def qt6_lookup_synthetic(valobj: SBValue, internal_dict):
     elif (has_cpp_generic_type(valobj, 'QHash', '::iterator')
           or has_cpp_generic_type(valobj, 'QHash', '::const_iterator')):
         return QHashIteratorSynth(valobj)
+    elif has_cpp_type(valobj, 'QJsonArray'):
+        return QJsonArraySynth(valobj)
     elif has_cpp_type(valobj, 'QJsonObject'):
         return QJsonObjectSynth(valobj)
     elif has_cpp_type(valobj, 'QJsonValue'):

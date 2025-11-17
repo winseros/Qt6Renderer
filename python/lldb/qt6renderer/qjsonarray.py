@@ -5,13 +5,11 @@ from .platformhelpers import get_pointer_type
 from .qcborcontainerprivate import QCborContainerPrivate
 from .qcborcontainerprivatesynth import QCborContainerPrivateSynth
 
-
-def qjsonobject_summary(valobj: SBValue) -> str:
+def qjsonarray_summary(valobj: SBValue) -> str:
     size = valobj.GetChildMemberWithName(QCborContainerPrivateSynth.PROP_SIZE)
     return f'size={size.GetValueAsSigned()}'
 
-
-class QJsonObjectSynth(AbstractSynth):
+class QJsonArraySynth(AbstractSynth):
     def update(self) -> bool:
         t_pointer = get_pointer_type(self._valobj)
         pointer = self._valobj.CreateValueFromAddress('ptr', self._valobj.load_addr, t_pointer)
@@ -21,7 +19,7 @@ class QJsonObjectSynth(AbstractSynth):
         if pointer.GetValueAsUnsigned():
             container = QCborContainerPrivate(pointer)
             synth = QCborContainerPrivateSynth(self._valobj, container)
-            children = synth.get_children_as_map()
+            children = synth.get_children_as_array()
 
             self._values = [QCborContainerPrivateSynth.get_size_value(self._valobj, len(children))] + children
         else:

@@ -9,6 +9,7 @@ from .qcborcontainerprivatesynth import QCborContainerPrivateSynth
 def qtcborelement_summaru(valobj: SBValue):
     prop_size = valobj.GetChildMemberWithName(QCborContainerPrivateSynth.PROP_SIZE)
     prop_type = valobj.GetChildMemberWithName(QCborContainerPrivateSynth.PROP_TYPE).GetValueAsSigned()
+
     if prop_type == QCborValue.TYPE_Map:
         return f'Map, size={prop_size.GetValueAsSigned()}'
     elif prop_type == QCborValue.TYPE_Array:
@@ -25,7 +26,7 @@ class QtCborElementSynth(AbstractSynth):
             synth = QCborContainerPrivateSynth(self._valobj, element.container())
             children = synth.get_children_as_map()
             meta_info = [
-                QCborContainerPrivateSynth.get_size_value(self._valobj, len(children) + 2),
+                QCborContainerPrivateSynth.get_size_value(self._valobj, len(children)),
                 QCborContainerPrivateSynth.get_type_value(element.type())
             ]
             self._values = meta_info + children
@@ -34,7 +35,7 @@ class QtCborElementSynth(AbstractSynth):
             synth = QCborContainerPrivateSynth(self._valobj, element.container())
             children = synth.get_children_as_array()
             meta_info = [
-                QCborContainerPrivateSynth.get_size_value(self._valobj, len(children) + 2),
+                QCborContainerPrivateSynth.get_size_value(self._valobj, len(children)),
                 QCborContainerPrivateSynth.get_type_value(element.type())
             ]
             self._values = meta_info + children
