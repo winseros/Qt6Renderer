@@ -67,7 +67,7 @@ class QCborContainerPrivateSynth:
         elif element_type == QCborValue.TYPE_True:
             return self._get_bool_value(name, True)
         elif element_type == QCborValue.TYPE_Null:
-            return self._null_null_value(name)
+            return self._add_null_value(name)
         elif element_type == QCborValue.TYPE_Map or element_type == QCborValue.TYPE_Array:
             return self._get_container_value(name, element.pointer())
 
@@ -89,7 +89,7 @@ class QCborContainerPrivateSynth:
         data_type = self._valobj.target.GetBasicType(eBasicTypeDouble)
         return self._valobj.CreateValueFromData(name, value.GetData(), data_type)
 
-    def _null_null_value(self, name: str) -> SBValue:
+    def _add_null_value(self, name: str) -> SBValue:
         data_type = self._valobj.target.GetBasicType(eBasicTypeNullPtr)
         data = SBData.CreateDataFromInt(0)
         return self._valobj.CreateValueFromData(name, data, data_type)

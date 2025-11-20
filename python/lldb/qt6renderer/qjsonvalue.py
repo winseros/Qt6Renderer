@@ -1,19 +1,42 @@
-from lldb import eBasicTypeDouble, eBasicTypeBool, eBasicTypeLongLong, eBasicTypeNullPtr
+from typing import Union, List
+from lldb import eBasicTypeDouble, eBasicTypeBool, eBasicTypeLongLong, eBasicTypeNullPtr, eBasicTypeChar
 
 from lldb import SBValue, SBData
 from .abstractsynth import AbstractSynth
 from .qcborvalue import QCborValue
+from .qcborcontainerprivatesynth import QCborContainerPrivateSynth
 
 
-def qjsonvalue_summary(valobj):
-    pass
+def qjsonvalue_summary(valobj: SBValue) -> str:
+    type = valobj.GetChildMemberWithName(QJsonValueSynth.PROP_TYPE).GetValueAsSigned()
+    if type == QJsonValueSynth.TYPE_Null:
+        return 'Null'
+    if type == QJsonValueSynth.TYPE_Bool:
+        value = valobj.GetChildMemberWithName(QJsonValueSynth.PROP_VALUE).GetValueAsSigned()
+        return 'True' if value else 'False'
+    if type == QJsonValueSynth.TYPE_Double:
+        value = valobj.GetChildMemberWithName(QJsonValueSynth.PROP_VALUE).GetValue()
+        return value
+    if type == QJsonValueSynth.TYPE_String:
+        txt = ''
+        value = valobj.GetChildMemberWithName(QJsonValueSynth.PROP_VALUE)
+        chars = value.data.sint8 if value.type.GetArrayElementType() == valobj.target.GetBasicType(
+            eBasicTypeChar) else value.data.sint16
+        for char in chars:
+            txt += chr(char)
+        return txt
+    if type == QJsonValueSynth.TYPE_Array:
+        size = valobj.GetChildMemberWithName(QCborContainerPrivateSynth.PROP_SIZE).GetValueAsSigned()
+        return f'Array, size={size}'
+    if type == QJsonValueSynth.TYPE_Object:
+        size = valobj.GetChildMemberWithName(QCborContainerPrivateSynth.PROP_SIZE).GetValueAsSigned()
+        return f'Object, size={size}'
+    return '<Undefined>'
 
 
 class QJsonValueSynth(AbstractSynth):
     PROP_TYPE = 'Type'
     PROP_VALUE = 'Value'
-    PROP_SIZE = 'Size'
-    PROP_RAW = 'RawData'
 
     TYPE_Null = 0x0
     TYPE_Bool = 0x1
@@ -23,56 +46,78 @@ class QJsonValueSynth(AbstractSynth):
     TYPE_Object = 0x5
     TYPE_Undefined = 0x80
 
-    def get_child_index(self, name: str) -> int:
-        num_children = self.num_children()
-
-        if name == self.PROP_TYPE:
-            return 0
-        elif num_children > 1 and name == self.PROP_VALUE:
-            return 1
-
-        return -1
+    def __init__(self, valobj: SBValue):
+        super().__init__(valobj)
+        self._cbor_element_type = None
 
     def update(self) -> bool:
         cbor_value = QCborValue.from_sb_value(self._valobj)
 
+        self._values = []
         self._add_json_type(self.PROP_TYPE, cbor_value.type())
-        self._add_cbor_value(cbor_value)
+        self._add_cbor_value(self.PROP_VALUE, cbor_value)
 
         return False
 
-    def _add_cbor_value(self, cbor: QCborValue):
+    def _add_cbor_value(self, name: str, cbor: QCborValue) -> None:
+        values = self._get_cbor_value(name, cbor)
+        for value in values:
+            self._values.append(value)
+
+    def _get_cbor_value(self, name: str, cbor: QCborValue) -> List[SBValue]:
         element_type = cbor.type().GetValueAsSigned()
         if (element_type in [QCborValue.TYPE_Integer, QCborValue.TYPE_String,
                              QCborValue.TYPE_Url, QCborValue.TYPE_DateTime, QCborValue.TYPE_RegularExpression,
                              QCborValue.TYPE_Uuid, QCborValue.TYPE_ByteArray]):
-            self._add_sb_value(self.PROP_VALUE, cbor.get_value())
+            return [self._get_sb_value(name, cbor.get_value())]
         elif element_type == QCborValue.TYPE_Double:
-            self._add_double_value(self.PROP_VALUE, cbor.get_value())
+            return [self._get_double_value(name, cbor.get_value())]
         elif element_type == QCborValue.TYPE_False:
-            self._add_bool_value(self.PROP_VALUE, False)
+            return [self._get_bool_value(name, False)]
         elif element_type == QCborValue.TYPE_True:
-            self._add_bool_value(self.PROP_VALUE, True)
+            return [self._get_bool_value(name, True)]
         elif element_type == QCborValue.TYPE_Null:
-            pass
+            return [self._add_null_value(name)]
+        elif element_type == QCborValue.TYPE_Map:
+            values = QCborContainerPrivateSynth(self._valobj, cbor.container()).get_children_as_map()
+            size = QCborContainerPrivateSynth.get_size_value(self._valobj, len(values))
+            return [size] + values
+        elif element_type == QCborValue.TYPE_Array:
+            values = QCborContainerPrivateSynth(self._valobj, cbor.container()).get_children_as_array()
+            size = QCborContainerPrivateSynth.get_size_value(self._valobj, len(values))
+            return [size] + values
 
-    def _add_bool_value(self, name: str, value: bool) -> None:
+    def _get_bool_value(self, name: str, value: bool) -> SBValue:
         data_type = self._valobj.target.GetBasicType(eBasicTypeBool)
         data = SBData.CreateDataFromInt(value)
-        self._values.append(self._valobj.CreateValueFromData(name, data, data_type))
+        return self._valobj.CreateValueFromData(name, data, data_type)
 
-    def _add_sb_value(self, name: str, value: SBValue) -> None:
-        self._values.append(self._valobj.CreateValueFromAddress(name, value.load_addr, value.type))
+    def _get_sb_value(self, name: str, value: SBValue) -> SBValue:
+        return self._valobj.CreateValueFromAddress(name, value.load_addr, value.type)
 
-    def _add_int_value(self, name: str, value: int) -> None:
+    def _add_int_value(self, name: str, value: int) -> SBValue:
         target = self._valobj.target
         data_type = target.GetBasicType(eBasicTypeLongLong)
         data = SBData.CreateDataFromSInt64Array(target.GetByteOrder(), target.GetAddressByteSize(), [value])
-        self._values.append(self._valobj.CreateValueFromData(name, data, data_type))
+        return self._valobj.CreateValueFromData(name, data, data_type)
 
-    def _add_double_value(self, name: str, value: SBValue) -> None:
+    def _get_double_value(self, name: str, value: SBValue) -> SBValue:
         data_type = self._valobj.target.GetBasicType(eBasicTypeDouble)
-        self._values.append(self._valobj.CreateValueFromData(name, value.GetData(), data_type))
+        return self._valobj.CreateValueFromData(name, value.GetData(), data_type)
+
+    def _add_null_value(self, name: str) -> SBValue:
+        data_type = self._valobj.target.GetBasicType(eBasicTypeNullPtr)
+        data = SBData.CreateDataFromInt(0)
+        return self._valobj.CreateValueFromData(name, data, data_type)
+
+    def _get_container_value(self, name: str, cbor: QCborValue) -> Union[SBValue, None]:
+        if not self._cbor_element_type:
+            self._cbor_element_type = self._valobj.target.FindFirstType('QtCbor::Element')
+        if not self._cbor_element_type:
+            print(f'Could not render the json object property: {name}')
+            return
+        container_prop = self._valobj.CreateValueFromAddress(name, cbor.co, self._cbor_element_type)
+        return container_prop
 
     def _add_json_type(self, name: str, cbor_type: SBValue) -> None:
         cbor_type = cbor_type.GetValueAsSigned()

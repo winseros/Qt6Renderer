@@ -16,7 +16,7 @@ from .qflags import qflags_summary
 from .qhash import qhash_summary, QHashSynth, QHashIteratorSynth
 from .qjsonarray import qjsonarray_summary, QJsonArraySynth
 from .qjsonobject import qjsonobject_summary, QJsonObjectSynth
-from .qjsonvalue import QJsonValueSynth
+from .qjsonvalue import qjsonvalue_summary, QJsonValueSynth
 from .qhostaddress import qhostaddress_summary
 from .qlist import qlist_summary, QListSynth
 from .qlocale import QLocaleSynth
@@ -64,6 +64,8 @@ def qt6_lookup_summary(valobj: SBValue, internal_dict):
         return qjsonarray_summary(valobj)
     elif has_cpp_type(valobj, 'QJsonObject'):
         return qjsonobject_summary(valobj)
+    elif has_cpp_type(valobj, 'QJsonValue'):
+        return qjsonvalue_summary(valobj)
     elif has_cpp_generic_type(valobj, 'QHash'):
         return qhash_summary(valobj)
     elif has_cpp_type(valobj, 'QHostAddress'):
