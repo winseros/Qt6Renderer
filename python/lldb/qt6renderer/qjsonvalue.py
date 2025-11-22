@@ -46,10 +46,6 @@ class QJsonValueSynth(AbstractSynth):
     TYPE_Object = 0x5
     TYPE_Undefined = 0x80
 
-    def __init__(self, valobj: SBValue):
-        super().__init__(valobj)
-        self._cbor_element_type = None
-
     def update(self) -> bool:
         cbor_value = QCborValue.from_sb_value(self._valobj)
 
@@ -109,15 +105,6 @@ class QJsonValueSynth(AbstractSynth):
         data_type = self._valobj.target.GetBasicType(eBasicTypeNullPtr)
         data = SBData.CreateDataFromInt(0)
         return self._valobj.CreateValueFromData(name, data, data_type)
-
-    def _get_container_value(self, name: str, cbor: QCborValue) -> Union[SBValue, None]:
-        if not self._cbor_element_type:
-            self._cbor_element_type = self._valobj.target.FindFirstType('QtCbor::Element')
-        if not self._cbor_element_type:
-            print(f'Could not render the json object property: {name}')
-            return
-        container_prop = self._valobj.CreateValueFromAddress(name, cbor.co, self._cbor_element_type)
-        return container_prop
 
     def _add_json_type(self, name: str, cbor_type: SBValue) -> None:
         cbor_type = cbor_type.GetValueAsSigned()

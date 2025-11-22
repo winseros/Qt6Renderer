@@ -1,12 +1,12 @@
 from typing import List
-from lldb import SBValue, SBData, eBasicTypeLongLong
+from lldb import SBValue
 from .abstractsynth import AbstractSynth
-from .qcborvalue import QCborValue
 from .qcborcontainerprivate import QCborElement
 from .qcborcontainerprivatesynth import QCborContainerPrivateSynth
+from .qcborvalue import QCborValue
 
 
-def qtcborelement_summaru(valobj: SBValue):
+def qtcborelement_summary(valobj: SBValue):
     prop_size = valobj.GetChildMemberWithName(QCborContainerPrivateSynth.PROP_SIZE)
     prop_type = valobj.GetChildMemberWithName(QCborContainerPrivateSynth.PROP_TYPE).GetValueAsSigned()
 
@@ -42,9 +42,3 @@ class QtCborElementSynth(AbstractSynth):
             return False
 
         return True
-
-    def _add_int_value(self, name: str, value: int) -> None:
-        target = self._valobj.target
-        data_type = target.GetBasicType(eBasicTypeLongLong)
-        data = SBData.CreateDataFromSInt64Array(target.GetByteOrder(), target.GetAddressByteSize(), [value])
-        self._values.append(self._valobj.CreateValueFromData(name, data, data_type))
