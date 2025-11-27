@@ -18,6 +18,7 @@ from .qjsonarray import qjsonarray_summary, QJsonArraySynth
 from .qjsondocument import qjsondocument_summary, QJsonDocumentSynth
 from .qjsonobject import qjsonobject_summary, QJsonObjectSynth
 from .qjsonvalue import qjsonvalue_summary, QJsonValueSynth
+from .qjsonvalueconstref import qjsonvalueconstref_summary, QjsonValueConstRefSynth
 from .qhostaddress import qhostaddress_summary
 from .qlist import qlist_summary, QListSynth
 from .qlocale import QLocaleSynth
@@ -69,6 +70,8 @@ def qt6_lookup_summary(valobj: SBValue, internal_dict):
         return qjsonobject_summary(valobj)
     elif has_cpp_type(valobj, 'QJsonValue'):
         return qjsonvalue_summary(valobj)
+    elif has_cpp_type(valobj, 'QJsonValueConstRef') or has_cpp_type(valobj, 'QJsonValueRef'):
+        return qjsonvalueconstref_summary(valobj)
     elif has_cpp_generic_type(valobj, 'QHash'):
         return qhash_summary(valobj)
     elif has_cpp_type(valobj, 'QHostAddress'):
@@ -137,6 +140,8 @@ def qt6_lookup_synthetic(valobj: SBValue, internal_dict):
         return QJsonObjectSynth(valobj)
     elif has_cpp_type(valobj, 'QJsonValue'):
         return QJsonValueSynth(valobj)
+    elif has_cpp_type(valobj, 'QJsonValueConstRef') or has_cpp_type(valobj, 'QJsonValueRef'):
+        return QjsonValueConstRefSynth(valobj)
     elif has_cpp_generic_type(valobj, 'QList'):
         return QListSynth(valobj)
     elif has_cpp_type(valobj, 'QLocale'):

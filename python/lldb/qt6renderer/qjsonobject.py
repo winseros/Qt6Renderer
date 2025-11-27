@@ -1,7 +1,7 @@
 from typing import List
 from lldb import SBValue
 from .abstractsynth import AbstractSynth
-from .platformhelpers import get_pointer_type
+from .platformhelpers import get_void_pointer_type
 from .qcborcontainerprivate import QCborContainerPrivate
 from .qcborcontainerprivatesynth import QCborContainerPrivateSynth
 
@@ -13,7 +13,7 @@ def qjsonobject_summary(valobj: SBValue) -> str:
 
 class QJsonObjectSynth(AbstractSynth):
     def update(self) -> bool:
-        t_pointer = get_pointer_type(self._valobj)
+        t_pointer = get_void_pointer_type(self._valobj)
         pointer = self._valobj.CreateValueFromAddress('ptr', self._valobj.load_addr, t_pointer)
 
         self._values: List[SBValue] = []

@@ -1,7 +1,7 @@
 from lldb import SBValue, SBType, eBasicTypeInt
 from math import ceil
 from typing import Union, Callable
-from .platformhelpers import get_pointer_type
+from .platformhelpers import get_void_pointer_type
 
 
 class SyntheticStruct:
@@ -40,7 +40,7 @@ class SyntheticStruct:
         setattr(self, name, lambda: synthetic_struct)
 
     def add_synthetic_field_pointer(self, name: str, synthetic_struct_ctor: Callable[[SBValue], 'SyntheticStruct']):
-        ptr_t = get_pointer_type(self._pointer)
+        ptr_t = get_void_pointer_type(self._pointer)
 
         field_byte_offset = self._get_field_byte_offset(ptr_t)
         field_name = f'{self._pointer.name}.{name}.{field_byte_offset}_{ptr_t.size}-ptr'

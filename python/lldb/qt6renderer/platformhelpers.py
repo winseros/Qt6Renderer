@@ -1,4 +1,4 @@
-from lldb import SBValue, SBType
+from lldb import SBValue, SBType, eBasicTypeInt, eBasicTypeLongLong
 
 
 def platform_is_32bit(valobj: SBValue) -> bool:
@@ -12,5 +12,13 @@ def platform_is_windows(valobj: SBValue) -> bool:
     return windows
 
 
-def get_pointer_type(valobj: SBValue) -> SBType:
+def get_void_pointer_type(valobj: SBValue) -> SBType:
+    # note for future myself
+    # void pointer is convenient to use for SyntheticStruct debugging
     return valobj.target.FindFirstType('void').GetPointerType()
+
+
+def get_int_pointer_type(valobj: SBValue) -> SBType:
+    # note for future myself
+    # int pointer is convenient to use when need to dereference
+    return valobj.target.GetBasicType(eBasicTypeInt if platform_is_32bit(valobj) else eBasicTypeLongLong).GetPointerType()

@@ -3,7 +3,7 @@ from .syntheticstruct import SyntheticStruct
 from .abstractsynth import AbstractSynth
 from .qcborvalue import QCborValue
 from .qcborcontainerprivatesynth import QCborContainerPrivateSynth
-from .platformhelpers import get_pointer_type
+from .platformhelpers import get_void_pointer_type
 
 
 def qjsondocument_summary(valobj: SBValue):
@@ -54,7 +54,7 @@ class QJsonDocumentSynth(AbstractSynth):
         if not d.IsValid():
             return False
 
-        pointer = self._valobj.CreateValueFromAddress('ptr', d.load_addr, get_pointer_type(self._valobj))
+        pointer = self._valobj.CreateValueFromAddress('ptr', d.load_addr, get_void_pointer_type(self._valobj))
         if not pointer.GetValueAsSigned():
             data = self._valobj.data.CreateDataFromInt(QCborValue.TYPE_Null)
             self._values = [self._valobj.CreateValueFromData(QJsonDocumentSynth.PROP_TYPE, data, self._t_type)]

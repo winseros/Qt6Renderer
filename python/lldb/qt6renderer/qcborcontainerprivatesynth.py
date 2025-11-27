@@ -33,7 +33,7 @@ class QCborContainerPrivateSynth:
             name = self._container.string_data_at(i)
             name_str = self._get_string(name)
 
-            child = self._get_index_value(name_str, self._container, i + 1)
+            child = self.get_index_value(name_str, self._container, i + 1)
             if child:
                 children.append(child)
 
@@ -45,13 +45,13 @@ class QCborContainerPrivateSynth:
         children: List[SBValue] = []
 
         for i in range(0, num_children):
-            child = self._get_index_value(f'[{i}]', self._container, i)
+            child = self.get_index_value(f'[{i}]', self._container, i)
             if child:
                 children.append(child)
 
         return children
 
-    def _get_index_value(self, name: str, container: QCborContainerPrivate, index: int) -> Union[SBValue, None]:
+    def get_index_value(self, name: str, container: QCborContainerPrivate, index: int) -> Union[SBValue, None]:
         element = container.elements().d().element_at(index)
         element_type = element.type().GetValueAsSigned()
         if (element_type in [QCborValue.TYPE_Integer, QCborValue.TYPE_String,

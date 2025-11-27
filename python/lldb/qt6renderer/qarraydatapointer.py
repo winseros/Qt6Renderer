@@ -2,7 +2,7 @@ from lldb import SBValue, SBData, eBasicTypeLongLong, eBasicTypeInt
 from .lazysynth import LazySynth
 from .syntheticstruct import SyntheticStruct
 from typing import Callable, Generic, TypeVar, Union
-from .platformhelpers import get_pointer_type
+from .platformhelpers import get_void_pointer_type
 
 
 class QArrayData(SyntheticStruct):
@@ -29,7 +29,7 @@ class QArrayDataPointer(SyntheticStruct, Generic[T]):
         self._element_size_value = None
         self._element_type = pointer.target.GetBasicType(eBasicTypeInt)
         self.add_synthetic_field_pointer('get_d', lambda p: QArrayData(p))
-        self.add_sb_type_field('get_ptr', get_pointer_type(pointer))
+        self.add_sb_type_field('get_ptr', get_void_pointer_type(pointer))
         self.add_basic_type_field('get_size', eBasicTypeLongLong)
 
     def get_d(self) -> QArrayData:
