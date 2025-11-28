@@ -33,7 +33,7 @@ class QCborContainerPrivateSynth:
             name = self._container.string_data_at(i)
             name_str = self._get_string(name)
 
-            child = self.get_index_value(name_str, self._container, i + 1)
+            child = self.get_index_value(f'[{name_str}]', self._container, i + 1)
             if child:
                 children.append(child)
 

@@ -35,8 +35,8 @@ def qjsonvalue_summary(valobj: SBValue) -> str:
 
 
 class QJsonValueSynth(AbstractSynth):
-    PROP_TYPE = 'Type'
-    PROP_VALUE = 'Value'
+    PROP_TYPE = 'type'
+    PROP_VALUE = 'value'
 
     TYPE_Null = 0x0
     TYPE_Bool = 0x1
