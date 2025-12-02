@@ -7,7 +7,7 @@ from lldb import (eBasicTypeLongLong,
                   eBasicTypeChar16,
                   SBValue,
                   SBData)
-from .platformhelpers import platform_is_32bit
+from .platformhelpers import platform_is_32bit, get_named_type
 from .syntheticstruct import SyntheticStruct
 from .qshareddata import QSharedData
 from .qarraydatapointer import QArrayDataPointerContainer
@@ -87,7 +87,7 @@ class QCborElement(SyntheticStruct):
         self.add_basic_type_field('value', eBasicTypeLongLong)
         self.add_gap_field(-pointer.target.GetBasicType(eBasicTypeLongLong).size)  # emulate a union field
         self.add_synthetic_field_pointer('container', lambda p: QCborContainerPrivate(p))
-        self.add_named_type_field('type', 'QCborValue::Type')
+        self.add_sb_type_field('type', get_named_type(pointer.target, 'QCborValue::Type', eBasicTypeInt))
         self.add_basic_type_field('flags', eBasicTypeInt)
 
     def pointer(self):

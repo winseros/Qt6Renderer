@@ -20,6 +20,8 @@ class SyntheticStruct:
 
     def add_named_type_field(self, name: str, type_name: str, getter_name: str = None):
         sb_type = self._pointer.GetTarget().FindFirstType(type_name)
+        if not sb_type.IsValid():
+            raise NameError(f'Could not resolve the type: {type_name}')
         self._add_field(name, sb_type, getter_name)
 
     def add_sb_type_field(self, name: str, sb_type: SBType, getter_name: str = None):

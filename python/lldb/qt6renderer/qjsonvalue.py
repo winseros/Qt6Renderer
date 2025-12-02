@@ -1,10 +1,11 @@
-from typing import Union, List
-from lldb import eBasicTypeDouble, eBasicTypeBool, eBasicTypeLongLong, eBasicTypeNullPtr, eBasicTypeChar
+from typing import List
+from lldb import eBasicTypeInt, eBasicTypeDouble, eBasicTypeBool, eBasicTypeLongLong, eBasicTypeNullPtr, eBasicTypeChar
 
 from lldb import SBValue, SBData
 from .abstractsynth import AbstractSynth
 from .qcborvalue import QCborValue
 from .qcborcontainerprivatesynth import QCborContainerPrivateSynth
+from .platformhelpers import get_named_type
 
 
 def qjsonvalue_summary(valobj: SBValue) -> str:
@@ -124,6 +125,6 @@ class QJsonValueSynth(AbstractSynth):
         else:
             json_type = QJsonValueSynth.TYPE_Undefined
 
-        t_json_type = self._valobj.target.FindFirstType('QJsonValue::Type')
+        t_json_type = get_named_type(self._valobj.target, 'QJsonValue::Type', eBasicTypeInt)
         sb_value = self._valobj.CreateValueFromData(name, self._valobj.data.CreateDataFromInt(json_type), t_json_type)
         self._values.append(sb_value)

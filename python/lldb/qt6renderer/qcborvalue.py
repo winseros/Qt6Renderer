@@ -1,9 +1,9 @@
 from typing import Union
-from lldb import (eBasicTypeLongLong,
-                  SBValue)
+from lldb import eBasicTypeInt, eBasicTypeLongLong, SBValue
 
 from .abstractsynth import AbstractSynth
 from .syntheticstruct import SyntheticStruct
+from .platformhelpers import get_named_type
 from . import qcborcontainerprivate
 
 
@@ -65,7 +65,7 @@ class QCborValue(SyntheticStruct):
         cbor = QCborValue(pointer)
         cbor.add_basic_type_field('n', eBasicTypeLongLong)
         cbor.add_synthetic_field_pointer('container', lambda p: qcborcontainerprivate.QCborContainerPrivate(p))
-        cbor.add_named_type_field('type', 'QCborValue::Type')
+        cbor.add_sb_type_field('type', get_named_type(pointer.target, 'QCborValue::Type', eBasicTypeInt))
         return cbor
 
     @staticmethod

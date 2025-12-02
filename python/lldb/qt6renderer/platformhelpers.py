@@ -1,4 +1,4 @@
-from lldb import SBValue, SBType, eBasicTypeInt, eBasicTypeLongLong
+from lldb import SBValue, SBType, SBTarget, eBasicTypeInt, eBasicTypeLongLong
 
 
 def platform_is_32bit(valobj: SBValue) -> bool:
@@ -21,4 +21,14 @@ def get_void_pointer_type(valobj: SBValue) -> SBType:
 def get_int_pointer_type(valobj: SBValue) -> SBType:
     # note for future myself
     # int pointer is convenient to use when need to dereference
-    return valobj.target.GetBasicType(eBasicTypeInt if platform_is_32bit(valobj) else eBasicTypeLongLong).GetPointerType()
+    return valobj.target.GetBasicType(
+        eBasicTypeInt if platform_is_32bit(valobj) else eBasicTypeLongLong).GetPointerType()
+
+
+def get_named_type(t: SBTarget, type_name: str, fallback_type: int) -> SBType:
+    typ = t.FindFirstType(type_name)
+    if typ.IsValid():
+        return typ
+
+    typ = t.GetBasicType(fallback_type)
+    return typ

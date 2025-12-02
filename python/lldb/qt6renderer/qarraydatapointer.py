@@ -2,7 +2,7 @@ from lldb import SBValue, SBData, eBasicTypeLongLong, eBasicTypeInt
 from .lazysynth import LazySynth
 from .syntheticstruct import SyntheticStruct
 from typing import Callable, Generic, TypeVar, Union
-from .platformhelpers import get_void_pointer_type
+from .platformhelpers import get_void_pointer_type, get_named_type
 
 
 class QArrayData(SyntheticStruct):
@@ -11,7 +11,7 @@ class QArrayData(SyntheticStruct):
         super().__init__(pointer)
 
         self.add_named_type_field('ref', 'QBasicAtomicInt')
-        self.add_named_type_field('flags', 'QArrayData::ArrayOption')
+        self.add_sb_type_field('flags', get_named_type(pointer.target, 'QArrayData::ArrayOption', eBasicTypeInt))
         self.add_basic_type_field('alloc', eBasicTypeLongLong)
 
     def alloc(self) -> SBValue:

@@ -1,9 +1,9 @@
-from lldb import SBValue, SBData, SBType, eBasicTypeLongLong, eBasicTypeChar, eBasicTypeUnsignedInt
+from lldb import SBValue, eBasicTypeInt, eBasicTypeLongLong, eBasicTypeChar, eBasicTypeUnsignedInt
 from .syntheticstruct import SyntheticStruct
 from .abstractsynth import AbstractSynth
 from .qcborvalue import QCborValue
 from .qcborcontainerprivatesynth import QCborContainerPrivateSynth
-from .platformhelpers import get_void_pointer_type
+from .platformhelpers import get_void_pointer_type, get_named_type
 
 
 def qjsondocument_summary(valobj: SBValue):
@@ -45,7 +45,7 @@ class QJsonDocumentSynth(AbstractSynth):
     def __init__(self, valobj: SBValue):
         super().__init__(valobj)
         self._t_size = valobj.target.GetBasicType(eBasicTypeLongLong)
-        self._t_type = valobj.target.FindFirstType('QCborValue::Type')
+        self._t_type = get_named_type(valobj.target, 'QCborValue::Type', eBasicTypeInt)
 
     def update(self) -> bool:
         self._values = []
