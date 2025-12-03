@@ -42,7 +42,8 @@ def qt6_lookup_summary(valobj: SBValue, internal_dict):
     if not qt_version or qt_version < QtVersion.V6_0_0:
         return None
 
-    if has_cpp_type(valobj, 'QAtomicInt') or has_cpp_type(valobj, 'QBasicAtomicInt'):
+    if has_cpp_type(valobj, 'QAtomicInt') or has_cpp_type(valobj, 'QBasicAtomicInt')\
+            or has_cpp_generic_type(valobj, 'QBasicAtomicInteger'):
         return qatomicint_summary(valobj)
     elif has_cpp_type(valobj, 'QBitArray'):
         return qbitarray_summary(valobj)
