@@ -42,7 +42,7 @@ class QSharedDataPointer(SyntheticStruct, Generic[TPointee]):
     def __init__(self, pointer: SBValue, pointee_ctor: Callable[[SBValue], TPointee]):
         super().__init__(pointer)
 
-        self.add_synthetic_field('d', pointee_ctor, pointer=True)
+        self.add_synthetic_field_pointer('d', pointee_ctor)
 
     def d(self) -> TPointee:
         pass

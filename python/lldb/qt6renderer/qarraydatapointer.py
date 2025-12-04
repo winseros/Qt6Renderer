@@ -1,5 +1,74 @@
-from lldb import SBValue, SBData, eBasicTypeInt
+from lldb import SBValue, SBData, eBasicTypeLongLong, eBasicTypeInt
 from .lazysynth import LazySynth
+from .syntheticstruct import SyntheticStruct
+from typing import Callable, Generic, TypeVar, Union
+from .platformhelpers import get_void_pointer_type, get_named_type
+
+
+class QArrayData(SyntheticStruct):
+
+    def __init__(self, pointer: SBValue):
+        super().__init__(pointer)
+
+        self.add_named_type_field('ref', 'QBasicAtomicInt')
+        self.add_sb_type_field('flags', get_named_type(pointer.target, 'QArrayData::ArrayOption', eBasicTypeInt))
+        self.add_basic_type_field('alloc', eBasicTypeLongLong)
+
+    def alloc(self) -> SBValue:
+        pass
+
+
+T = TypeVar('T')
+
+
+class QArrayDataPointer(SyntheticStruct, Generic[T]):
+    def __init__(self, pointer: SBValue, element_ctor: Callable[[SBValue], SyntheticStruct]):
+        super().__init__(pointer)
+
+        self._element_ctor = element_ctor
+        self._element_size_value = None
+        self._element_type = pointer.target.GetBasicType(eBasicTypeInt)
+        self.add_synthetic_field_pointer('get_d', lambda p: QArrayData(p))
+        self.add_sb_type_field('get_ptr', get_void_pointer_type(pointer))
+        self.add_basic_type_field('get_size', eBasicTypeLongLong)
+
+    def get_d(self) -> QArrayData:
+        pass
+
+    def get_ptr(self) -> SBValue:
+        pass
+
+    def get_size(self) -> SBValue:
+        # just "size" conflicts with the SyntheticStruct property
+        pass
+
+    def element_at(self, index: int, value_name: Callable[[int], str] = None) -> Union[T, None]:
+        if not self.get_ptr():
+            return None
+
+        name = value_name(index) if value_name else f'[{index}]'
+
+        element_addr = self.get_ptr().GetValueAsUnsigned() + self._element_size * index
+        element_ref = self._pointer.CreateValueFromAddress(name, element_addr, self._element_type)
+
+        element = self._element_ctor(element_ref)
+        return element
+
+    @property
+    def _element_size(self):
+        if not self._element_size_value:
+            element = self._element_ctor(self._pointer)
+            self._element_size_value = element.size
+        return self._element_size_value
+
+
+class QArrayDataPointerContainer(Generic[T], SyntheticStruct):
+    def __init__(self, valobj: SBValue, element_ctor: Callable[[SBValue], T]):
+        super().__init__(valobj)
+        self.add_synthetic_field('d', lambda p: QArrayDataPointer(p, element_ctor))
+
+    def d(self) -> QArrayDataPointer[T]:
+        pass
 
 
 class QArrayDataPointerSynth(LazySynth):
@@ -51,35 +120,41 @@ class QArrayDataPointerSynth(LazySynth):
         d = self._valobj.GetChildMemberWithName('d')
 
         size = d.GetChildMemberWithName(QArrayDataPointerSynth.PROP_SIZE)
-        self._values[self._num_data_fields] = size
-        self._bump_field_counter()
-
-        if size.GetValueAsSigned() <= 0:
-            return False
+        self._add_field(size)
 
         d_d = d.GetChildMemberWithName('d')
 
         if d_d.GetValueAsUnsigned():
             alloc = d_d.GetChildMemberWithName('alloc')
-            self._values[self._num_data_fields] = self._valobj.CreateValueFromData(
+
+            size_v = size.GetValueAsSigned()
+            alloc_v = alloc.GetValueAsSigned()
+
+            if size_v > alloc_v:
+                # a half-initialized list
+                return False
+
+            alloc = self._valobj.CreateValueFromData(
                 QArrayDataPointerSynth.PROP_CAPACITY, alloc.GetData() if alloc else SBData.CreateDataFromInt(0),
                 alloc.GetType() if alloc else self._valobj.target.GetBasicType(eBasicTypeInt))
-            self._bump_field_counter()
+            self._add_field(alloc)
+
+            if size_v <= 0 or alloc_v <= 0:
+                return False
 
             d_ptr = d.GetChildMemberWithName('ptr')
             if d_ptr.GetValueAsUnsigned():
-                self._values[self._num_data_fields] = self._valobj.CreateValueFromData(
+                d_ptr = self._valobj.CreateValueFromData(
                     QArrayDataPointerSynth.PROP_RAW_DATA, d_ptr.data,
                     d_ptr.type)
-                self._bump_field_counter()
-
-                size_v = size.GetValueAsSigned()
-                alloc_v = alloc.GetValueAsSigned()
-                if 0 <= size_v <= alloc_v and alloc_v >= 0:
-                    # otherwise a half-initialized list
-                    self._num_children += size.GetValueAsUnsigned()
+                self._add_field(d_ptr)
+                self._num_children += size.GetValueAsUnsigned()
 
         return False
+
+    def _add_field(self, field: SBValue) -> None:
+        self._values[self._num_data_fields] = field
+        self._bump_field_counter()
 
     def _reset_field_counter(self):
         self._num_children = 0

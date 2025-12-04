@@ -1,0 +1,30 @@
+from typing import List
+from lldb import SBValue
+from .abstractsynth import AbstractSynth
+from .platformhelpers import get_void_pointer_type
+from .qcborcontainerprivate import QCborContainerPrivate
+from .qcborcontainerprivatesynth import QCborContainerPrivateSynth
+
+
+def qjsonarray_summary(valobj: SBValue) -> str:
+    size = valobj.GetChildMemberWithName(QCborContainerPrivateSynth.PROP_SIZE)
+    return f'size={size.GetValueAsSigned()}'
+
+
+class QJsonArraySynth(AbstractSynth):
+    def update(self) -> bool:
+        t_pointer = get_void_pointer_type(self._valobj)
+        pointer = self._valobj.CreateValueFromAddress('ptr', self._valobj.load_addr, t_pointer)
+
+        self._values: List[SBValue] = []
+
+        if pointer.GetValueAsUnsigned():
+            container = QCborContainerPrivate(pointer)
+            synth = QCborContainerPrivateSynth(self._valobj, container)
+            children = synth.get_children_as_array()
+
+            self._values = [QCborContainerPrivateSynth.get_size_value(self._valobj, len(children))] + children
+        else:
+            self._values = [QCborContainerPrivateSynth.get_size_value(self._valobj, 0)]
+
+        return False

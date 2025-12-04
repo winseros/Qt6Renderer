@@ -4,6 +4,7 @@ from .helpers import has_cpp_type, has_cpp_generic_type
 from .qatomicint import qatomicint_summary
 from .qbitarray import qbitarray_summary, QBitArraySynth
 from .qbytearray import qbytearray_summary, QByteArraySynth
+from .qcborvalue import QCborValueSynth
 from .qchar import qchar_summary
 from .qdate import qdate_summary, QDateSynth
 from .qdatetime import qdatetime_summary, QDateTimeSynth
@@ -13,6 +14,11 @@ from .qfile import qfile_summary, QFileSynth, QTemporaryFileSynth
 from .qfileinfo import qfileinfo_summary, QFileInfoSynth
 from .qflags import qflags_summary
 from .qhash import qhash_summary, QHashSynth, QHashIteratorSynth
+from .qjsonarray import qjsonarray_summary, QJsonArraySynth
+from .qjsondocument import qjsondocument_summary, QJsonDocumentSynth
+from .qjsonobject import qjsonobject_summary, QJsonObjectSynth
+from .qjsonvalue import qjsonvalue_summary, QJsonValueSynth
+from .qjsonvalueconstref import qjsonvalueconstref_summary, QjsonValueConstRefSynth
 from .qhostaddress import qhostaddress_summary
 from .qlist import qlist_summary, QListSynth
 from .qlocale import QLocaleSynth
@@ -21,6 +27,7 @@ from .qscopedpointer import qscopedpointer_summary, QScopedPointerSynth
 from .qshareddatapointer import qshareddatapointer_summary, QSharedDataPointerSynth
 from .qsharedpointer import qsharedpointer_summary, QSharedPointerSynth
 from .qstring import qstring_summary, QStringSynth
+from .qtcbor_element import qtcborelement_summary, QtCborElementSynth
 from .qtemporarydir import qtemporarydir_summary, QTemporaryDirSynth
 from .qtime import qtime_summary, QTimeSynth
 from .qtimezone import qtimezone_summary, QTimeZoneSynth
@@ -35,7 +42,8 @@ def qt6_lookup_summary(valobj: SBValue, internal_dict):
     if not qt_version or qt_version < QtVersion.V6_0_0:
         return None
 
-    if has_cpp_type(valobj, 'QAtomicInt') or has_cpp_type(valobj, 'QBasicAtomicInt'):
+    if has_cpp_type(valobj, 'QAtomicInt') or has_cpp_type(valobj, 'QBasicAtomicInt')\
+            or has_cpp_generic_type(valobj, 'QBasicAtomicInteger'):
         return qatomicint_summary(valobj)
     elif has_cpp_type(valobj, 'QBitArray'):
         return qbitarray_summary(valobj)
@@ -55,6 +63,16 @@ def qt6_lookup_summary(valobj: SBValue, internal_dict):
         return qfileinfo_summary(valobj)
     elif has_cpp_generic_type(valobj, 'QFlags'):
         return qflags_summary(valobj)
+    elif has_cpp_type(valobj, 'QJsonArray'):
+        return qjsonarray_summary(valobj)
+    elif has_cpp_type(valobj, 'QJsonDocument'):
+        return qjsondocument_summary(valobj)
+    elif has_cpp_type(valobj, 'QJsonObject'):
+        return qjsonobject_summary(valobj)
+    elif has_cpp_type(valobj, 'QJsonValue'):
+        return qjsonvalue_summary(valobj)
+    elif has_cpp_type(valobj, 'QJsonValueConstRef') or has_cpp_type(valobj, 'QJsonValueRef'):
+        return qjsonvalueconstref_summary(valobj)
     elif has_cpp_generic_type(valobj, 'QHash'):
         return qhash_summary(valobj)
     elif has_cpp_type(valobj, 'QHostAddress'):
@@ -69,6 +87,8 @@ def qt6_lookup_summary(valobj: SBValue, internal_dict):
         return qsharedpointer_summary(valobj)
     elif has_cpp_type(valobj, 'QString'):
         return qstring_summary(valobj)
+    elif has_cpp_type(valobj, 'QtCbor::Element'):
+        return qtcborelement_summary(valobj)
     elif has_cpp_type(valobj, 'QTemporaryDir'):
         return qtemporarydir_summary(valobj)
     elif has_cpp_type(valobj, 'QTime'):
@@ -94,6 +114,8 @@ def qt6_lookup_synthetic(valobj: SBValue, internal_dict):
         return QBitArraySynth(valobj)
     elif has_cpp_type(valobj, 'QByteArray'):
         return QByteArraySynth(valobj)
+    elif has_cpp_type(valobj, 'QCborValue'):
+        return QCborValueSynth(valobj)
     elif has_cpp_type(valobj, 'QDate'):
         return QDateSynth(valobj)
     elif has_cpp_type(valobj, 'QDateTime'):
@@ -111,6 +133,16 @@ def qt6_lookup_synthetic(valobj: SBValue, internal_dict):
     elif (has_cpp_generic_type(valobj, 'QHash', '::iterator')
           or has_cpp_generic_type(valobj, 'QHash', '::const_iterator')):
         return QHashIteratorSynth(valobj)
+    elif has_cpp_type(valobj, 'QJsonArray'):
+        return QJsonArraySynth(valobj)
+    elif has_cpp_type(valobj, 'QJsonDocument'):
+        return QJsonDocumentSynth(valobj)
+    elif has_cpp_type(valobj, 'QJsonObject'):
+        return QJsonObjectSynth(valobj)
+    elif has_cpp_type(valobj, 'QJsonValue'):
+        return QJsonValueSynth(valobj)
+    elif has_cpp_type(valobj, 'QJsonValueConstRef') or has_cpp_type(valobj, 'QJsonValueRef'):
+        return QjsonValueConstRefSynth(valobj)
     elif has_cpp_generic_type(valobj, 'QList'):
         return QListSynth(valobj)
     elif has_cpp_type(valobj, 'QLocale'):
@@ -127,6 +159,8 @@ def qt6_lookup_synthetic(valobj: SBValue, internal_dict):
         return QSharedPointerSynth(valobj)
     elif has_cpp_type(valobj, 'QString'):
         return QStringSynth(valobj)
+    elif has_cpp_type(valobj, 'QtCbor::Element'):
+        return QtCborElementSynth(valobj)
     elif has_cpp_type(valobj, 'QTemporaryDir'):
         return QTemporaryDirSynth(valobj)
     elif has_cpp_type(valobj, 'QTime'):
