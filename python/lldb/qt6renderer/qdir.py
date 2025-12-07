@@ -49,7 +49,7 @@ class QDirSynth(AbstractSynth):
         # the below code does not work on Windows; due to outdated LLDB, I guess
         exists = self._valobj.EvaluateExpression('exists()')
         if exists.IsValid() and exists.type.IsValid():
-            exists = self._valobj.CreateValueFromAddress(QDirSynth.PROP_EXISTS, exists.load_addr, exists.type)
+            exists = self._valobj.CreateValueFromData(QDirSynth.PROP_EXISTS, exists.data, exists.type)
             self._values.append(exists)
 
         return False

@@ -26,37 +26,11 @@ class QFileInfoSynth(AbstractSynth):
     PROP_IS_SYMLINK = 'isSymLink'
     PROP_IS_WRITABLE = 'isWritable'
 
-    def get_child_index(self, name: str) -> int:
-        if name == QFileInfoSynth.PROP_PATH:
-            return 0
-        elif name == QFileInfoSynth.PROP_CACHING and self.num_children() > 1:
-            return 1
-        elif name == QFileInfoSynth.PROP_EXISTS and self.num_children() > 2:
-            return 2
-        elif name == QFileInfoSynth.PROP_IS_DIR and self.num_children() > 3:
-            return 3
-        elif name == QFileInfoSynth.PROP_IS_EXECUTABLE and self.num_children() > 4:
-            return 4
-        elif name == QFileInfoSynth.PROP_IS_FILE and self.num_children() > 5:
-            return 5
-        elif name == QFileInfoSynth.PROP_IS_HIDDEN and self.num_children() > 6:
-            return 6
-        elif name == QFileInfoSynth.PROP_IS_READABLE and self.num_children() > 7:
-            return 7
-        elif name == QFileInfoSynth.PROP_IS_RELATIVE and self.num_children() > 8:
-            return 8
-        elif name == QFileInfoSynth.PROP_IS_SYMLINK and self.num_children() > 9:
-            return 9
-        elif name == QFileInfoSynth.PROP_IS_WRITABLE and self.num_children() > 10:
-            return 10
-        else:
-            return -1
-
     def update(self) -> bool:
         fi = QFileInfo(self._valobj)
 
         file_path = fi.d_ptr().d().file_entry().file_path()
-        self._values = [self._valobj.CreateValueFromData(QFileInfoSynth.PROP_PATH, file_path.data, file_path.type)]
+        self._values = [self._valobj.CreateValueFromAddress(QFileInfoSynth.PROP_PATH, file_path.load_addr, file_path.type)]
 
         [self._try_add_property(x) for x in [QFileInfoSynth.PROP_CACHING, QFileInfoSynth.PROP_EXISTS,
                                              QFileInfoSynth.PROP_IS_DIR, QFileInfoSynth.PROP_IS_EXECUTABLE,
