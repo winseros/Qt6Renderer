@@ -20,8 +20,7 @@ class QCborValueSynth(AbstractSynth):
     def update(self) -> bool:
         val = QCborValue.from_sb_value(self._valobj)
 
-        self._values.append(
-            self._valobj.CreateValueFromData(QCborValueSynth.PROP_TYPE, val.type().data, val.type().type))
+        self._values = [self._valobj.CreateValueFromData(QCborValueSynth.PROP_TYPE, val.type().data, val.type().type)]
 
         sb_value = val.get_value()
         if sb_value:
