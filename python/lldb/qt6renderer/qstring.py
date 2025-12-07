@@ -12,7 +12,7 @@ def qstring_summary_no_quotes(valobj: SBValue) -> str:
         return ''
 
     sb_raw = valobj.GetChildMemberWithName(QArrayDataPointerSynth.PROP_RAW_DATA)
-    if not sb_raw:
+    if not sb_raw.IsValid():
         return ''
 
     # QString is char16_t in the C++ code.

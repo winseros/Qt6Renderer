@@ -89,11 +89,11 @@ class QArrayDataPointerSynth(LazySynth):
     def get_child_index(self, name: str) -> int:
         if name == self.PROP_SIZE:
             return 0
-        elif self._num_data_fields > 0 and name == self.PROP_CAPACITY:
+        elif self._num_data_fields > 1 and name == self.PROP_CAPACITY:
             return 1
-        elif self._num_data_fields > 1 and name == self.PROP_RAW_DATA:
+        elif self._num_data_fields > 2 and name == self.PROP_RAW_DATA:
             return 2
-        elif self._num_data_fields > 2:
+        elif self._num_data_fields > 3:
             index = name.lstrip('[').rstrip(']')
             if index.isdigit():
                 return int(index) + self._num_data_fields
