@@ -71,7 +71,7 @@ class QCborContainerPrivate(QSharedData):
         elements = self.elements().d().element_at(index)
         if elements.flags().GetValueAsSigned() & QCborElement.VALUE_FLAG_StringIsUtf16:
             data_t = self._pointer.target.GetBasicType(eBasicTypeChar16)
-            value = value.CreateValueFromData(value.name, value.data, data_t)
+            value = value.CreateValueFromAddress(value.name, value.load_addr, data_t)
 
         return value
 

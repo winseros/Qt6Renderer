@@ -11,16 +11,10 @@ class QCborValueSynth(AbstractSynth):
     PROP_TYPE = 'type'
     PROP_VALUE = 'value'
 
-    def get_child_index(self, name: str) -> int:
-        if name == QCborValueSynth.PROP_TYPE:
-            return 0
-        else:
-            return -1
-
     def update(self) -> bool:
         val = QCborValue.from_sb_value(self._valobj)
 
-        self._values = [self._valobj.CreateValueFromData(QCborValueSynth.PROP_TYPE, val.type().data, val.type().type)]
+        self._values = [self._valobj.CreateValueFromAddress(QCborValueSynth.PROP_TYPE, val.type().load_addr, val.type().type)]
 
         sb_value = val.get_value()
         if sb_value:
