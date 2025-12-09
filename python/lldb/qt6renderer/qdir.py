@@ -1,4 +1,4 @@
-from lldb import SBValue
+from lldb import SBValue, eBasicTypeInt
 from .qt import qt, QtVersion
 from .abstractsynth import AbstractSynth
 from .qfilesystementry import QFileSystemEntry
@@ -6,6 +6,7 @@ from .qstring import qstring_summary
 from .syntheticstruct import SyntheticStruct
 from .qshareddatapointer import QSharedDataPointer
 from .qshareddata import QSharedData
+from .platformhelpers import get_named_type
 
 
 def qdir_summary(valobj):
@@ -77,8 +78,8 @@ class QDirPrivate655(QSharedData):
         self.add_named_type_field('files', 'QStringList')
         self.add_named_type_field('file_infos', 'QList<int>')
         self.add_named_type_field('name_filters', 'QStringList')
-        self.add_named_type_field('sort', 'QDir::SortFlags')
-        self.add_named_type_field('filters', 'QDir::Filters')
+        self.add_sb_type_field('sort', get_named_type(pointer.target,'QDir::SortFlags', eBasicTypeInt))
+        self.add_sb_type_field('filters', get_named_type(pointer.target,'QDir::Filters', eBasicTypeInt))
         self.add_gap_field(8)  # sizeof(std::unique_ptr<>)
         self.add_synthetic_field('path', lambda p: QFileSystemEntry(p))
         self.add_synthetic_field('abs_path', lambda p: QFileSystemEntry(p))
@@ -95,8 +96,8 @@ class QDirPrivate66(QSharedData):
         super().__init__(pointer)
 
         self.add_named_type_field('name_filters', 'QStringList')
-        self.add_named_type_field('sort', 'QDir::SortFlags')
-        self.add_named_type_field('filters', 'QDir::Filters')
+        self.add_sb_type_field('sort', get_named_type(pointer.target, 'QDir::SortFlags', eBasicTypeInt))
+        self.add_sb_type_field('filters', get_named_type(pointer.target,'QDir::Filters', eBasicTypeInt))
         self.add_gap_field(8)  # sizeof(std::unique_ptr<>)
         self.add_synthetic_field('dir_entry', lambda p: QFileSystemEntry(p))
         self.add_synthetic_field('file_cache', lambda p: FileCache(p))
