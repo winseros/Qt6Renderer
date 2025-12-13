@@ -1,15 +1,16 @@
 from lldb import SBValue
 from .abstractsynth import AbstractSynth
 from .qshareddata import QSharedData
-from .qfilesystementry import QFileSystemEntry
+from .qfilesystementry import QFileSystemEntry, file_system_entry_is_initialized
 from .qstring import qstring_summary
 from .syntheticstruct import SyntheticStruct
 from .qshareddatapointer import QSharedDataPointer
+from .platformhelpers import get_int_pointer_type
 
 
 def qfileinfo_summary(valobj: SBValue) -> str:
     prop = valobj.GetChildMemberWithName(QFileInfoSynth.PROP_PATH)
-    text = qstring_summary(prop)
+    text = qstring_summary(prop) if prop.IsValid() else ''
     return text
 
 
@@ -28,8 +29,15 @@ class QFileInfoSynth(AbstractSynth):
 
     def update(self) -> bool:
         fi = QFileInfo(self._valobj)
+        if not fi.d_ptr().GetValueAsUnsigned():
+            self._values = []
+            return False
 
-        file_path = fi.d_ptr().d().file_entry().file_path()
+        file_entry = fi.d().d().file_entry()
+        if not file_system_entry_is_initialized(file_entry):
+            return False
+
+        file_path = file_entry.file_path()
         self._values = [self._valobj.CreateValueFromAddress(QFileInfoSynth.PROP_PATH, file_path.load_addr, file_path.type)]
 
         [self._try_add_property(x) for x in [QFileInfoSynth.PROP_CACHING, QFileInfoSynth.PROP_EXISTS,
@@ -58,7 +66,13 @@ class QFileInfoPrivate(QSharedData):
 class QFileInfo(SyntheticStruct):
     def __init__(self, pointer: SBValue):
         super().__init__(pointer)
-        self.add_synthetic_field('d_ptr', lambda p: QSharedDataPointer(p, lambda q: QFileInfoPrivate(q)))
+        self.add_synthetic_field('d', lambda p: QSharedDataPointer(p, lambda q: QFileInfoPrivate(q)))
+        t_ptr = get_int_pointer_type(pointer)
+        self.add_gap_field(-t_ptr.size)
+        self.add_sb_type_field('d_ptr', t_ptr)
 
-    def d_ptr(self) -> QSharedDataPointer[QFileInfoPrivate]:
+    def d(self) -> QSharedDataPointer[QFileInfoPrivate]:
+        pass
+
+    def d_ptr(self) -> SBValue:
         pass

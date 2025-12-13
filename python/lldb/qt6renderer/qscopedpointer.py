@@ -23,9 +23,8 @@ class QScopedPointerSynth(AbstractSynth):
         self._values = [self._valobj.CreateValueFromData(QScopedPointerSynth.PROP_POINTER, d.data, d.type)]
 
         if d.GetValueAsUnsigned():
-            value = d.Dereference()
             self._values = [
                 self._valobj.CreateValueFromData(self.PROP_POINTER, d.data, d.type),
-                self._valobj.CreateValueFromData(self.PROP_VALUE, value.data, value.type),
+                self._valobj.CreateValueFromAddress(self.PROP_VALUE, d.GetValueAsUnsigned(), d.deref.type),
             ]
         return False

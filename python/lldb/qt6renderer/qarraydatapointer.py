@@ -6,6 +6,8 @@ from .platformhelpers import get_void_pointer_type, get_named_type
 
 
 class QArrayData(SyntheticStruct):
+    FLAG_ARRAY_OPTION_DEFAULT = 0x0
+    FLAG_ARRAY_OPTION_RESERVED = 0x1
 
     def __init__(self, pointer: SBValue):
         super().__init__(pointer)
@@ -125,6 +127,11 @@ class QArrayDataPointerSynth(LazySynth):
         d_d = d.GetChildMemberWithName('d')
 
         if d_d.GetValueAsUnsigned():
+            flags = d_d.GetChildMemberWithName('flags').data.sint8[0]
+            if flags != QArrayData.FLAG_ARRAY_OPTION_DEFAULT and flags != QArrayData.FLAG_ARRAY_OPTION_RESERVED:
+                # a half-initialized list
+                return False
+
             alloc = d_d.GetChildMemberWithName('alloc')
 
             size_v = size.GetValueAsSigned()
@@ -144,9 +151,8 @@ class QArrayDataPointerSynth(LazySynth):
 
             d_ptr = d.GetChildMemberWithName('ptr')
             if d_ptr.GetValueAsUnsigned():
-                d_ptr = self._valobj.CreateValueFromData(
-                    QArrayDataPointerSynth.PROP_RAW_DATA, d_ptr.data,
-                    d_ptr.type)
+                d_ptr = self._valobj.CreateValueFromAddress(
+                    QArrayDataPointerSynth.PROP_RAW_DATA, d_ptr.load_addr, d_ptr.type)
                 self._add_field(d_ptr)
                 self._num_children += size.GetValueAsUnsigned()
 

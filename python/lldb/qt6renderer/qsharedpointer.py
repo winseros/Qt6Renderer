@@ -30,11 +30,10 @@ class QSharedPointerSynth(AbstractSynth):
         self._values = [self._valobj.CreateValueFromData(QSharedPointerSynth.PROP_POINTER, p_value.data, p_value.type)]
 
         if p_value.GetValueAsUnsigned():
-            value = p_value.Dereference()
             d = self._valobj.GetChildMemberWithName('d').Dereference()
             self._values = [
                 self._valobj.CreateValueFromData(self.PROP_POINTER, p_value.data, p_value.type),
-                self._valobj.CreateValueFromData(self.PROP_VALUE, value.data, value.type),
+                self._valobj.CreateValueFromAddress(self.PROP_VALUE, p_value.GetValueAsUnsigned(), p_value.deref.type),
                 d.GetChildMemberWithName(self.PROP_STRONG_REF),
                 d.GetChildMemberWithName(self.PROP_WEAK_REF)
             ]
