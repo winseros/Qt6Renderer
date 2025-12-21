@@ -7,7 +7,7 @@ from .qstring import qstring_summary
 from .syntheticstruct import SyntheticStruct
 from .qshareddatapointer import QSharedDataPointer
 from .qshareddata import QSharedData
-from .platformhelpers import get_named_type, get_int_pointer_type
+from .platformhelpers import get_named_type, get_int_pointer_type, platform_is_windows
 
 
 def qdir_summary(valobj):
@@ -37,8 +37,10 @@ class QDirSynth(AbstractSynth):
 
             file_path_entry = dir_private.dir_entry()
             absolute_dir_entry = dir_private.file_cache().absolute_dir_entry()
-            if (not file_system_entry_is_initialized(file_path_entry)
-                    or not file_system_entry_is_initialized(absolute_dir_entry)):
+            if not file_system_entry_is_initialized(file_path_entry):
+                return False
+
+            if not platform_is_windows(self._valobj) and not file_system_entry_is_initialized(absolute_dir_entry):
                 return False
 
             file_path = file_path_entry.file_path()
@@ -61,8 +63,10 @@ class QDirSynth(AbstractSynth):
 
             file_path_entry = dir_private.path()
             abs_path_entry = dir_private.abs_path()
-            if (not file_system_entry_is_initialized(file_path_entry)
-                    or not file_system_entry_is_initialized(abs_path_entry)):
+            if not file_system_entry_is_initialized(file_path_entry):
+                return False
+
+            if not platform_is_windows(self._valobj) and not file_system_entry_is_initialized(abs_path_entry):
                 return False
 
             file_path = file_path_entry.file_path()
