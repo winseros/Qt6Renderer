@@ -10,7 +10,7 @@ from .platformhelpers import get_int_pointer_type
 
 def qfileinfo_summary(valobj: SBValue) -> str:
     prop = valobj.GetChildMemberWithName(QFileInfoSynth.PROP_PATH)
-    text = qstring_summary(prop) if prop.IsValid() else ''
+    text = qstring_summary(prop) if prop.IsValid() else '""'
     return text
 
 

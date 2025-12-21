@@ -12,7 +12,7 @@ from .platformhelpers import get_named_type, get_int_pointer_type, platform_is_w
 
 def qdir_summary(valobj):
     path = valobj.GetChildMemberWithName(QDirSynth.PROP_PATH)
-    path_text = qstring_summary(path) if path.IsValid() else ''
+    path_text = qstring_summary(path) if path.IsValid() else '""'
     return path_text
 
 
