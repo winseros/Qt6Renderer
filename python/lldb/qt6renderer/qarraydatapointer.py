@@ -16,6 +16,9 @@ class QArrayData(SyntheticStruct):
         self.add_sb_type_field('flags', get_named_type(pointer.target, 'QArrayData::ArrayOption', eBasicTypeInt))
         self.add_basic_type_field('alloc', eBasicTypeLongLong)
 
+    def flags(self) -> SBValue:
+        pass
+
     def alloc(self) -> SBValue:
         pass
 
@@ -127,12 +130,13 @@ class QArrayDataPointerSynth(LazySynth):
         d_d = d.GetChildMemberWithName('d')
 
         if d_d.GetValueAsUnsigned():
-            flags = d_d.GetChildMemberWithName('flags').data.sint8[0]
+            array_data = QArrayData(d_d)
+            flags = array_data.flags().data.sint8[0]
             if flags != QArrayData.FLAG_ARRAY_OPTION_DEFAULT and flags != QArrayData.FLAG_ARRAY_OPTION_RESERVED:
                 # a half-initialized list
                 return False
 
-            alloc = d_d.GetChildMemberWithName('alloc')
+            alloc = array_data.alloc()
 
             size_v = size.GetValueAsSigned()
             alloc_v = alloc.GetValueAsSigned()
